@@ -38,7 +38,7 @@
     "sveltekit-superforms": "^2.3.0",
     "tailwind-merge": "^2.2.1",
     "tailwind-variants": "^0.2.0",
-    "xlsx": "^0.18.5",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.1/xlsx-0.20.1.tgz",
     "zod": "^3.22.4"
   },
   "main": "src/electron.js",
