@@ -30,13 +30,11 @@
     ];
 </script>
 
-<div class="flex justify-center mt-[20%]">
+<div class="flex justify-center">
     <Tabs.Root value="import" class="w-[80%]">
         <Tabs.List class="grid w-full grid-cols-4">
             {#each subpages as subpage}
-                <Tabs.Trigger value={subpage.value}
-                    >{subpage.title}</Tabs.Trigger
-                >
+                <Tabs.Trigger value={subpage.value}>{subpage.title}</Tabs.Trigger>
             {/each}
         </Tabs.List>
         {#each subpages as subpage}

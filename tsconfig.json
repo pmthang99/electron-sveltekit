@@ -1,5 +1,9 @@
 {
-    "extends": "./.svelte-kit/tsconfig.json"
+    "extends": "./.svelte-kit/tsconfig.json",
+    "compilerOptions": {
+        "allowSyntheticDefaultImports": true,
+        "ignoreDeprecations": "5.0"
+    }
 
     // Path aliases are handled by https://kit.svelte.dev/docs/configuration#alias
     //

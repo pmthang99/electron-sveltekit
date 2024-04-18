@@ -1,75 +1,84 @@
 {
-  "author": "anonymous",
-  "devDependencies": {
-    "@electron/rebuild": "^3.6.0",
-    "@sveltejs/adapter-node": "^1.0.0-next.101",
-    "@sveltejs/adapter-static": "^1.0.0-next.48",
-    "@sveltejs/kit": "^1.0.0-next.562",
-    "@types/node": "^20.11.24",
-    "autoprefixer": "^10.4.16",
-    "concurrently": "^6.5.1",
-    "electron": "28",
-    "electron-builder": "^24.13.3",
-    "electron-reloader": "^1.2.3",
-    "postcss": "^8.4.32",
-    "postcss-load-config": "^5.0.2",
-    "sass": "^1.56.1",
-    "svelte": "^4.2.12",
-    "svelte-headless-table": "^0.18.2",
-    "svelte-preprocess": "^5.1.3",
-    "svelte-sonner": "^0.3.19",
-    "tailwindcss": "^3.3.6",
-    "ts-node": "10.8.1",
-    "typescript": "4",
-    "vite": "^4.0.4"
-  },
-  "license": "MIT",
-  "private": true,
-  "dependencies": {
-    "@internationalized/date": "^3.5.2",
-    "bcryptjs": "^2.4.3",
-    "better-sqlite3": "9.2.2",
-    "bits-ui": "^0.19.5",
-    "clsx": "^2.1.0",
-    "electron-serve": "^1.1.0",
-    "electron-window-state": "^5.0.3",
-    "formsnap": "^0.5.1",
-    "lucide-svelte": "^0.344.0",
-    "sveltekit-superforms": "^2.3.0",
-    "tailwind-merge": "^2.2.1",
-    "tailwind-variants": "^0.2.0",
-    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.1/xlsx-0.20.1.tgz",
-    "zod": "^3.22.4"
-  },
-  "main": "src/electron.js",
-  "scripts": {
-    "dev": "vite dev",
-    "package": "npm run build && electron-builder --config electron-builder.config.json",
-    "dev:package": "npm run build && electron-builder --config electron-builder.config.json --dir",
-    "electron:package": "electron-builder --config electron-builder.config.json --dir",
-    "dev:electron": "concurrently --kill-others \"vite dev\" \"electron .\"",
-    "preview": "vite preview",
-    "build": "vite build",
-    "rebuild": "electron-rebuild -f -w better-sqlite3",
-    "package-windows": "rm -rf build && rm -rf dist && npm run build && electron-builder -w -c.extraMetadata.main=build/electron.js"
-  },
-  "build": {
-    "appId": "sqlite.electron-test.app",
-    "productName": "SQLite Electron",
-    "files": [
-      "build/**/*",
-      "node_modules/**/*",
-      "public/**/*"
-    ],
-    "directories": {
-      "buildResources": "public"
+    "author": "anonymous",
+    "devDependencies": {
+        "@electron/rebuild": "^3.6.0",
+        "@sveltejs/adapter-node": "^1.0.0-next.101",
+        "@sveltejs/adapter-static": "^1.0.0-next.48",
+        "@sveltejs/kit": "^1.30.4",
+        "@sveltejs/vite-plugin-svelte": "^3.1.0",
+        "@types/bcryptjs": "^2.4.6",
+        "@types/better-sqlite3": "^7.6.9",
+        "@types/node": "^20.11.24",
+        "autoprefixer": "^10.4.16",
+        "concurrently": "^6.5.1",
+        "electron": "28",
+        "electron-builder": "^24.13.3",
+        "electron-reloader": "^1.2.3",
+        "lucia": "^3.1.1",
+        "postcss": "^8.4.32",
+        "postcss-load-config": "^5.0.2",
+        "sass": "^1.56.1",
+        "svelte": "^4.2.12",
+        "svelte-headless-table": "^0.18.2",
+        "svelte-preprocess": "^5.1.3",
+        "svelte-radix": "^1.1.0",
+        "svelte-sonner": "^0.3.19",
+        "tailwindcss": "^3.3.6",
+        "ts-node": "10.8.1",
+        "typescript": "^4.9.5",
+        "vite": "^4.0.4"
     },
-    "extraResources": [
-      "./demo_table.db"
-    ]
-  },
-  "version": "1.0.0",
-  "name": "electron-sveltekit",
-  "type": "module",
-  "description": "Electron and SvelteKit integration"
+    "license": "MIT",
+    "private": true,
+    "dependencies": {
+        "@internationalized/date": "^3.5.2",
+        "@lucia-auth/adapter-sqlite": "^3.0.1",
+        "bcryptjs": "^2.4.3",
+        "better-sqlite3": "9.2.2",
+        "bits-ui": "^0.19.7",
+        "clsx": "^2.1.0",
+        "electron-serve": "^1.1.0",
+        "electron-window-state": "^5.0.3",
+        "formsnap": "^0.5.1",
+        "lucide-svelte": "^0.344.0",
+        "oslo": "^1.2.0",
+        "sveltekit-superforms": "^2.3.0",
+        "tailwind-merge": "^2.2.1",
+        "tailwind-variants": "^0.2.0",
+        "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.2/xlsx-0.20.2.tgz",
+        "zod": "^3.22.4"
+    },
+    "main": "src/electron.js",
+    "scripts": {
+        "dev": "vite dev",
+        "package": "npm run build && electron-builder --config electron-builder.config.json",
+        "dev:package": "npm run build && electron-builder --config electron-builder.config.json --dir",
+        "electron:package": "electron-builder --config electron-builder.config.json --dir",
+        "dev:electron": "concurrently --kill-others \"vite dev\" \"electron .\"",
+        "preview": "vite preview",
+        "build": "vite build",
+        "rebuild": "electron-rebuild -f -w better-sqlite3",
+        "package-windows": "rm -rf build && rm -rf dist && npm run build && electron-builder -w -c.extraMetadata.main=build/electron.js",
+        "reset": "node --env-file=.env scripts/reset.js",
+        "setup": "node --env-file=.env scripts/setup.js"
+    },
+    "build": {
+        "appId": "sqlite.electron-test.app",
+        "productName": "SQLite Electron",
+        "files": [
+            "build/**/*",
+            "node_modules/**/*",
+            "public/**/*"
+        ],
+        "directories": {
+            "buildResources": "public"
+        },
+        "extraResources": [
+            "./demo_table.db"
+        ]
+    },
+    "version": "1.0.0",
+    "name": "electron-sveltekit",
+    "type": "module",
+    "description": "Electron and SvelteKit integration"
 }
