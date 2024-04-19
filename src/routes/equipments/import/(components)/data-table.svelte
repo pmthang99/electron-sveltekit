@@ -1,39 +1,52 @@
 <script lang="ts">
-    import { addPagination } from 'svelte-headless-table/plugins';
+    import { addPagination, addTableFilter } from 'svelte-headless-table/plugins';
     import * as Table from '$lib/components/ui/table';
     import { Render, Subscribe, createTable } from 'svelte-headless-table';
     import { readable } from 'svelte/store';
     import DataTablePagination from './data-table-pagination.svelte';
+    import { Input } from '$lib/components/ui/input';
 
     export let source: any[];
 
     const table = createTable(readable(source), {
         page: addPagination(),
+        filter: addTableFilter({
+            fn: ({ filterValue, value }) => {
+                return value.toLowerCase().includes(filterValue.toLowerCase());
+            },
+            initialFilterValue: '',
+        }),
     });
 
     const columns = table.createColumns([
         table.column({
             accessor: 'name',
-            header: 'Tên tài liệu',
+            header: 'Trang bị',
         }),
         table.column({
             accessor: 'code',
-            header: 'Mã tài liệu',
+            header: 'Mã trang bị',
             cell: ({ value }) => value ?? '--',
         }),
         table.column({
             accessor: 'quantity',
             header: 'Số lượng',
+            plugins: {
+                filter: { exclude: true },
+            },
         }),
         table.column({
             accessor: 'author',
-            header: 'Tác giả',
+            header: 'Nước sản xuất',
             cell: ({ value }) => value ?? '--',
         }),
         table.column({
             accessor: 'year',
-            header: 'Năm',
+            header: 'Năm sản xuất',
             cell: ({ value }) => value ?? '--',
+            plugins: {
+                filter: { exclude: true },
+            },
         }),
         table.column({
             accessor: 'note',
@@ -43,10 +56,14 @@
     ]);
 
     const tableModel = table.createViewModel(columns);
-    const { headerRows, pageRows, tableAttrs, tableBodyAttrs } = tableModel;
+    const { headerRows, pageRows, tableAttrs, tableBodyAttrs, pluginStates } = tableModel;
+    const { filterValue } = pluginStates.filter;
 </script>
 
 <div>
+    <div class="flex items-center py-4">
+        <Input class="max-w-sm" placeholder="Trang bị..." type="text" bind:value={$filterValue} />
+    </div>
     <div class="rounded-md border">
         <Table.Root {...$tableAttrs}>
             <Table.Header>

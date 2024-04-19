@@ -7,17 +7,21 @@
     import { getLocalTimeZone, today } from '@internationalized/date';
     import type { DateRange } from 'bits-ui';
     import { Render, Subscribe, createTable } from 'svelte-headless-table';
+    import { addPagination } from 'svelte-headless-table/plugins';
     import { writable } from 'svelte/store';
 
     import { goto } from '$app/navigation';
     import { page } from '$app/stores';
     import type { PageData } from './$types';
+    import DataTablePagination from './(components)/data-table-pagination.svelte';
     export let data: PageData;
 
     let viewDialog = false;
 
     const dataSource = writable([]);
-    const table = createTable(dataSource);
+    const table = createTable(dataSource, {
+        page: addPagination(),
+    });
     const columns = table.createColumns([
         table.column({
             accessor: 'name',
@@ -59,7 +63,8 @@
         }),
     ]);
 
-    const { headerRows, pageRows, tableAttrs, tableBodyAttrs } = table.createViewModel(columns);
+    const tableModel = table.createViewModel(columns);
+    const { headerRows, pageRows, tableAttrs, tableBodyAttrs } = tableModel;
 
     const now = today(getLocalTimeZone());
 
@@ -81,22 +86,6 @@
     }
 
     function onQuery() {
-        // fetch('/api/inventory', {
-        //     method: 'POST',
-        //     body: JSON.stringify({
-        //         department_id: input.team.value,
-        //         item_id: input.item.value,
-        //     }),
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //     },
-        // })
-        //     .then((res) => res.json())
-        //     .then((data) => {
-        //         $dataSource = data.result;
-        //         viewDialog = true;
-        //     });
-
         const searchParams = new URLSearchParams();
         searchParams.set('departmentId', input.team.value);
         searchParams.set('itemName', input.item.value);
@@ -187,6 +176,9 @@
                     {/each}
                 </Table.Body>
             </Table.Root>
+        </div>
+        <div class="flex items-center justify-end space-x-4 py-4">
+            <DataTablePagination {tableModel} />
         </div>
     </Dialog.Content>
 </Dialog.Root>

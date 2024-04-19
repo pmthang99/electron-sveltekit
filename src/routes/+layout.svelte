@@ -9,8 +9,7 @@
     import SideBar from '$lib/SideBar.svelte';
     import { Card, CardContent } from '$lib/components/ui/card';
     import CardHeader from '$lib/components/ui/card/card-header.svelte';
-
-    export let data: LayoutServerData;
+    import { writable, type Writable } from 'svelte/store';
 
     // const { user } = data;
     // $loginSession = user;
@@ -39,12 +38,12 @@
     }
 
     let path: string;
-    let title: string;
+    let title: Writable<string> = writable('');
 
     let items = [
         {
             title: 'Tài liệu',
-            href: '/documents',
+            href: '/documents/',
             children: [
                 { title: 'Nhập tài liệu', href: '/documents/import' },
                 { title: 'Cấp tài liệu', href: '/documents/supply' },
@@ -54,7 +53,7 @@
         },
         {
             title: 'Tài liệu mật',
-            href: '/secrets',
+            href: '/secrets/',
             children: [
                 { title: 'Nhập tài liệu mật', href: '/secrets/import' },
                 { title: 'Cấp tài liệu mật', href: '/secrets/supply' },
@@ -81,16 +80,17 @@
     $: {
         path = $page.url.pathname;
         for (let item of items) {
-            if (item.href === path) {
-                title = item.title;
-                break;
-            }
             if (item.children) {
                 for (let child of item.children) {
-                    if (child.href === path) {
-                        title = child.title;
+                    if (path.includes(child.href)) {
+                        $title = child.title;
                         break;
                     }
+                }
+            } else {
+                if (path.includes(item.href)) {
+                    $title = item.title;
+                    break;
                 }
             }
         }
@@ -102,7 +102,7 @@
     <div class="col-span-3 lg:col-span-4 lg:border-l ml-15">
         <div class="container">
             <Card>
-                <CardHeader class="items-center">{title}</CardHeader>
+                <CardHeader class="items-center">{$title}</CardHeader>
                 <CardContent><slot /></CardContent>
             </Card>
         </div>

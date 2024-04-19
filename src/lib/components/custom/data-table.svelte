@@ -17,6 +17,8 @@
         page: addPagination(),
     });
 
+    const itemType = items[0].type ?? 'document';
+
     const columns = table.createColumns([
         table.display({
             id: 'select',
@@ -42,11 +44,11 @@
         }),
         table.column({
             accessor: 'name',
-            header: 'Tên tài liệu',
+            header: isEquipment() ? 'Trang bị' : 'Tài liệu',
         }),
         table.column({
             accessor: 'code',
-            header: 'Mã tài liệu',
+            header: isEquipment() ? 'Mã trang bị' : 'Mã tài liệu',
             cell: ({ value }) => value ?? '--',
         }),
         table.column({
@@ -55,7 +57,7 @@
         }),
         table.column({
             accessor: 'author',
-            header: 'Tác giả',
+            header: isEquipment() ? 'Nước sản xuất' : 'Tác giả',
             cell: ({ value }) => value ?? '--',
         }),
         table.column({
@@ -86,6 +88,10 @@
     onDestroy(() => {
         console.log('Destroyed');
     });
+
+    function isEquipment() {
+        return itemType === 'equipment';
+    }
 </script>
 
 <div class="space-y-4">

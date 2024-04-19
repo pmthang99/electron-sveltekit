@@ -39,11 +39,11 @@ function _handleFileUpload(file: File) {
         const data = xlsx.utils.sheet_to_json(worksheet, { header: 1, raw: false });
 
         const headerRow: any = data.shift();
-        const nameCol = headerRow.findIndex((e: string) => e === 'Tài liệu');
-        const codeCol = headerRow.findIndex((e: string) => e === 'Mã tài liệu') ?? null;
+        const nameCol = headerRow.findIndex((e: string) => e === 'Trang bị');
+        const codeCol = headerRow.findIndex((e: string) => e === 'Mã trang bị') ?? null;
         const quantityCol = headerRow.findIndex((e: string) => e === 'Số lượng');
-        const authorCol = headerRow.findIndex((e: string) => e === 'Tác giả');
-        const yearCol = headerRow.findIndex((e: string) => e === 'Năm');
+        const authorCol = headerRow.findIndex((e: string) => e === 'Nước sản xuất');
+        const yearCol = headerRow.findIndex((e: string) => e === 'Năm sản xuất');
         const noteCol = headerRow.findIndex((e: string) => e === 'Ghi chú');
 
         const itemList = [];

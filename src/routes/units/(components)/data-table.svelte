@@ -2,21 +2,31 @@
     import * as Table from '$lib/components/ui/table';
     import { onMount } from 'svelte';
     import { Render, Subscribe, createRender, createTable } from 'svelte-headless-table';
-    import { addPagination } from 'svelte-headless-table/plugins';
+    import { addPagination, addTableFilter } from 'svelte-headless-table/plugins';
     import { writable } from 'svelte/store';
     import DataTableActions from './data-table-actions.svelte';
     import DataTablePagination from './data-table-pagination.svelte';
+    import { Input } from '$lib/components/ui/input';
 
     export let data: any[];
 
     const dataSource = writable([]);
     const table = createTable(dataSource, {
         page: addPagination(),
+        filter: addTableFilter({
+            fn: ({ filterValue, value }) => {
+                return value.toLowerCase().includes(filterValue.toLowerCase());
+            },
+            initialFilterValue: '',
+        }),
     });
     const columns = table.createColumns([
         table.column({
             accessor: 'index',
             header: 'STT',
+            plugins: {
+                filter: { exclude: true },
+            },
         }),
         table.column({
             accessor: 'name',
@@ -28,11 +38,15 @@
             cell: ({ value }) => {
                 return createRender(DataTableActions, { id: value, refresh });
             },
+            plugins: {
+                filter: { exclude: true },
+            },
         }),
     ]);
 
     const tableModel = table.createViewModel(columns);
-    const { headerRows, pageRows, tableAttrs, tableBodyAttrs } = tableModel;
+    const { headerRows, pageRows, tableAttrs, tableBodyAttrs, pluginStates } = tableModel;
+    const { filterValue } = pluginStates.filter;
 
     onMount(() => {
         refresh();
@@ -44,7 +58,10 @@
     }
 </script>
 
-<div>
+<div class="mt-5">
+    <div class="flex items-center py-4">
+        <Input class="max-w-sm" placeholder="Tên đơn vị..." type="text" bind:value={$filterValue} />
+    </div>
     <div class="rounded-md border">
         <Table.Root {...$tableAttrs}>
             <Table.Header>
