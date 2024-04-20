@@ -7,13 +7,6 @@
     import { Label } from '$lib/components/ui/label';
     import type { ActionData } from './$types';
     export let form: ActionData;
-
-    $: {
-        if (form) {
-            console.log(form);
-            console.log(form.message);
-        }
-    }
 </script>
 
 <div
@@ -23,7 +16,7 @@
         <CardContent class="lg:p-8">
             <div class="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
                 <div class="grid gap-6">
-                    <form method="post" use:enhance>
+                    <form method="post">
                         <div class="grid gap-2">
                             <div class="grid gap-1">
                                 <Label class="sr-only" for="username">Email</Label>

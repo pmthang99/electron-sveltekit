@@ -1,17 +1,27 @@
+import { Role } from '$lib/enum';
 import { listItemDepartment, listItemDepartmentName, returnItemV2 } from '$lib/server/db';
 import { ItemType, type Item } from '$lib/server/db/types';
+import { redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
 const itemType = ItemType.Document;
 
-export const load = (async ({ url }) => {
+export const load = (async ({ locals, url }) => {
+    const { user } = locals;
+    const authorized = [Role.Admin];
+
+    if (!user) {
+        throw redirect(302, '/login');
+    }
+    if (!authorized.includes(user.role)) {
+        throw redirect(302, '/');
+    }
+
     const departmentId = parseInt(url.searchParams.get('departmentId'));
     const itemName = url.searchParams.get('itemName');
     if (!departmentId) {
         return {};
     }
-    // const { departments } = await parent();
-    // const departmentId = departments.find((d) => d.name === departmentName)?.id;
 
     const itemDepartmentNameList = listItemDepartmentName(itemType, departmentId) as {
         name: string;

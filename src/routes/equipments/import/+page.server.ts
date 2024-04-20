@@ -1,12 +1,23 @@
 import { importItems, listItem } from '$lib/server/db';
 import { ItemType } from '$lib/server/db/types';
-import { fail } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import * as xlsx from 'xlsx';
 import type { PageServerLoad } from './$types';
+import { Role } from '$lib/enum';
 
 const itemType = ItemType.Equipment;
 
-export const load = (() => {
+export const load = (({ locals }) => {
+    const { user } = locals;
+    const authorized = [Role.Admin];
+
+    if (!user) {
+        throw redirect(302, '/login');
+    }
+    if (!authorized.includes(user.role)) {
+        throw redirect(302, '/');
+    }
+
     const items = listItem(itemType);
     return {
         items,

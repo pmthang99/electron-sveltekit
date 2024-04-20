@@ -16,9 +16,24 @@ db.pragma('journal_mode = WAL');
 export default db;
 
 // USERS
+export function listUser() {
+    const stmt = db.prepare('SELECT * FROM user');
+    return stmt.all() as User[];
+}
+
 export function getUser(username: string) {
     const stmt = db.prepare('SELECT * FROM user WHERE username = ?');
     return stmt.get(username) as User;
+}
+
+export function addUser(username: string, password: string, role: string) {
+    const stmt = db.prepare('INSERT INTO user (username, password, role) VALUES (?, ?, ?)');
+    return stmt.run(username, password, role);
+}
+
+export function updatePassword(id: number, password: string) {
+    const stmt = db.prepare('UPDATE user SET password = ? WHERE id = ?');
+    return stmt.run(password, id);
 }
 
 // session

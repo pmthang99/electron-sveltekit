@@ -5,12 +5,6 @@ declare global {
             session: import('lucia').Session | null;
         }
     }
-
-    enum ItemType {
-        Document = 'document',
-        Secret = 'secret',
-        Equipment = 'equipment',
-    }
 }
 
 // declare namespace App {

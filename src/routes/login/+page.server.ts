@@ -7,8 +7,8 @@ import { getUser } from '$lib/server/db';
 import { lucia } from '$lib/server/auth';
 
 export const actions = {
-    default: async ({ cookies, request }) => {
-        const data = await request.formData();
+    default: async (event) => {
+        const data = await event.request.formData();
         const username = data.get('username');
         const password = data.get('password');
         if (
@@ -36,7 +36,6 @@ export const actions = {
 
         const valid = user && bcrypt.compareSync(password as string, user.password);
         if (!valid) {
-            console.log('Invalid');
             return fail(401, {
                 message: 'Invalid username or password',
             });
@@ -44,14 +43,13 @@ export const actions = {
 
         const session = await lucia.createSession(user.id, {});
         const sessionCookie = lucia.createSessionCookie(session.id);
-        cookies.set(sessionCookie.name, sessionCookie.value, {
+        event.cookies.set(sessionCookie.name, sessionCookie.value, {
             path: '.',
             ...sessionCookie.attributes,
         });
         // const sessionId = users.createSession(user);
         // cookies.set('sessionid', sessionId, { path: '/', httpOnly: true, sameSite: 'strict' });
 
-        // return { success: true };
         throw redirect(302, '/');
     },
 } satisfies Actions;

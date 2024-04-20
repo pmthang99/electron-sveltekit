@@ -7,12 +7,16 @@
     import '../app.pcss';
     import '../app.scss';
     import SideBar from '$lib/SideBar.svelte';
+    import Header from '$lib/Header.svelte';
     import { Card, CardContent } from '$lib/components/ui/card';
     import CardHeader from '$lib/components/ui/card/card-header.svelte';
     import { writable, type Writable } from 'svelte/store';
+    import { Role } from '$lib/enum';
+    import path from 'path';
 
-    // const { user } = data;
-    // $loginSession = user;
+    export let data: LayoutServerData;
+    const { user } = data;
+    $loginSession = user;
 
     beforeNavigate(() => {
         // let expiryDate = $loginSession.expires ? new Date($loginSession.expires) : undefined;
@@ -37,48 +41,92 @@
         }
     }
 
-    let path: string;
     let title: Writable<string> = writable('');
 
     let items = [
         {
+            title: 'Hệ thống',
+            href: '/admin',
+            roles: [Role.Admin],
+        },
+        {
             title: 'Tài liệu',
             href: '/documents/',
+            roles: [Role.Admin, Role.User],
             children: [
-                { title: 'Nhập tài liệu', href: '/documents/import' },
-                { title: 'Cấp tài liệu', href: '/documents/supply' },
-                { title: 'Trả tài liệu', href: '/documents/return' },
-                { title: 'Tra cứu', href: '/documents/query' },
+                {
+                    title: 'Nhập tài liệu',
+                    href: '/documents/import',
+                    roles: [Role.Admin],
+                },
+                {
+                    title: 'Cấp tài liệu',
+                    href: '/documents/supply',
+                    roles: [Role.Admin],
+                },
+                {
+                    title: 'Trả tài liệu',
+                    href: '/documents/return',
+                    roles: [Role.Admin],
+                },
+                { title: 'Tra cứu', href: '/documents/query', roles: [Role.Admin, Role.User] },
             ],
         },
         {
             title: 'Tài liệu mật',
             href: '/secrets/',
+            roles: [Role.Admin, Role.User],
             children: [
-                { title: 'Nhập tài liệu mật', href: '/secrets/import' },
-                { title: 'Cấp tài liệu mật', href: '/secrets/supply' },
-                { title: 'Trả tài liệu mật', href: '/secrets/return' },
-                { title: 'Tra cứu', href: '/secrets/query' },
+                {
+                    title: 'Nhập tài liệu mật',
+                    href: '/secrets/import',
+                    roles: [Role.Admin],
+                },
+                {
+                    title: 'Cấp tài liệu mật',
+                    href: '/secrets/supply',
+                    roles: [Role.Admin],
+                },
+                {
+                    title: 'Trả tài liệu mật',
+                    href: '/secrets/return',
+                    roles: [Role.Admin],
+                },
+                { title: 'Tra cứu', href: '/secrets/query', roles: [Role.Admin, Role.User] },
             ],
         },
         {
             title: 'Trang bị',
             href: '/equipments',
+            roles: [Role.Admin, Role.User],
             children: [
-                { title: 'Nhập trang bị', href: '/equipments/import' },
-                { title: 'Cấp trang bị', href: '/equipments/supply' },
-                { title: 'Trả trang bị', href: '/equipments/return' },
-                { title: 'Tra cứu', href: '/equipments/query' },
+                {
+                    title: 'Nhập trang bị',
+                    href: '/equipments/import',
+                    roles: [Role.Admin],
+                },
+                {
+                    title: 'Cấp trang bị',
+                    href: '/equipments/supply',
+                    roles: [Role.Admin],
+                },
+                {
+                    title: 'Trả trang bị',
+                    href: '/equipments/return',
+                    roles: [Role.Admin],
+                },
+                { title: 'Tra cứu', href: '/equipments/query', roles: [Role.Admin, Role.User] },
             ],
         },
         {
             title: 'Danh sách đơn vị',
             href: '/units',
+            roles: [Role.Admin],
         },
     ];
 
     $: {
-        path = $page.url.pathname;
+        const path = $page.url.pathname;
         for (let item of items) {
             if (item.children) {
                 for (let child of item.children) {
@@ -97,18 +145,30 @@
     }
 </script>
 
-<div class="pt-[14%] min-h-screen grid lg:grid-cols-5">
-    <SideBar class="bg-background" {items}></SideBar>
-    <div class="col-span-3 lg:col-span-4 lg:border-l ml-15">
-        <div class="container">
-            <Card>
-                <CardHeader class="items-center">{$title}</CardHeader>
-                <CardContent><slot /></CardContent>
-            </Card>
+<div class="flex flex-col min-h-screen">
+    {#if $page.url.pathname === '/login'}
+        <slot />
+    {:else}
+        <Header {user} />
+        <div class="flex flex-1">
+            <div class="w-[100%] pt-[14%] grid lg:grid-cols-5">
+                <SideBar class="bg-background min-h-[100%]" {items} {user}></SideBar>
+                <div class="col-span-3 lg:col-span-4 lg:border-l ml-15">
+                    <div class="container">
+                        <Card>
+                            <CardHeader class="items-center ">
+                                <h2 class="font-bold text-3xl tracking-tight">
+                                    {$title.toUpperCase()}
+                                </h2>
+                            </CardHeader>
+                            <CardContent><slot /></CardContent>
+                        </Card>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
+    {/if}
 </div>
-
 <!-- <div class="main">
     <slot />
 </div> -->
