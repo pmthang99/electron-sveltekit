@@ -1,6 +1,6 @@
 import type { Actions } from './$types';
 
-import * as bcrypt from 'bcryptjs';
+import bcrypt from 'bcryptjs';
 
 import { fail, redirect } from '@sveltejs/kit';
 import { getUser } from '$lib/server/db';
