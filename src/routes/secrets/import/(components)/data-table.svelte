@@ -56,18 +56,19 @@
     ]);
 
     const tableModel = table.createViewModel(columns);
-    const { headerRows, pageRows, tableAttrs, tableBodyAttrs, pluginStates } = tableModel;
+    const { headerRows, pageRows, rows, tableAttrs, tableBodyAttrs, pluginStates } = tableModel;
     const { filterValue } = pluginStates.filter;
 </script>
 
 <div>
-    <div class="flex items-center py-4">
+    <div class="flex gap-10 items-center py-4">
         <Input
             class="max-w-sm"
             placeholder="Tên tài liệu..."
             type="text"
             bind:value={$filterValue}
         />
+        <p>{$rows.length}</p>
     </div>
     <div class="rounded-md border">
         <Table.Root {...$tableAttrs}>
