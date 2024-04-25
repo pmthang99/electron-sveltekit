@@ -1,11 +1,10 @@
 <script lang="ts">
-    import { applyAction, deserialize, enhance } from '$app/forms';
+    import { applyAction, deserialize } from '$app/forms';
     import { invalidateAll } from '$app/navigation';
     import { Button, buttonVariants } from '$lib/components/ui/button';
     import {
         Dialog,
         DialogContent,
-        DialogFooter,
         DialogHeader,
         DialogTitle,
         DialogTrigger,
@@ -18,7 +17,7 @@
 
     let open = false;
     let isLoading = false;
-    let selectedRole;
+    let selectedRole: { value: string };
     // export let handleSubmit: (arg: string) => any;
     const formData = {
         username: '',
@@ -27,8 +26,8 @@
     };
 
     async function handleSubmit(event: { currentTarget: EventTarget & HTMLFormElement }) {
+        console.log('HELLLOOOO');
         if (!selectedRole.value) {
-            console.log('bthc');
             return;
         }
         isLoading = true;
@@ -49,7 +48,7 @@
             await invalidateAll();
         }
 
-        applyAction(result);
+        await applyAction(result);
 
         isLoading = false;
         open = false;
@@ -72,7 +71,7 @@
                     class="grid grid-cols-4 items-center gap-4"
                     id="form"
                     method="POST"
-                    action="?/addUser"
+                    action="/admin?/add"
                     on:submit|preventDefault={handleSubmit}
                 >
                     <Label for="username" class="text-right">Tên tài khoản</Label>

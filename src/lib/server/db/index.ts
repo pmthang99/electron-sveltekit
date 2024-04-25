@@ -1,14 +1,6 @@
 import Database from 'better-sqlite3';
 import { DB_PATH } from '$env/static/private';
-import {
-    TransactionType,
-    type Department,
-    type Inventory,
-    type Item,
-    type ItemType,
-    type Transaction,
-    type User,
-} from './types';
+import { type Department, type Item, type ItemType, type Transaction, TransactionType, type User } from './types';
 
 const db = new Database(DB_PATH, { verbose: console.log });
 db.pragma('journal_mode = WAL');
@@ -17,22 +9,27 @@ export default db;
 
 // USERS
 export function listUser() {
-    const stmt = db.prepare('SELECT * FROM user');
+    const stmt = db.prepare('SELECT * FROM "user"');
     return stmt.all() as User[];
 }
 
 export function getUser(username: string) {
-    const stmt = db.prepare('SELECT * FROM user WHERE username = ?');
+    const stmt = db.prepare('SELECT * FROM "user" WHERE username = ?');
     return stmt.get(username) as User;
 }
 
 export function addUser(username: string, password: string, role: string) {
-    const stmt = db.prepare('INSERT INTO user (username, password, role) VALUES (?, ?, ?)');
+    const stmt = db.prepare('INSERT INTO "user" (username, password, role) VALUES (?, ?, ?)');
     return stmt.run(username, password, role);
 }
 
+export function deleteUser(username: string) {
+    const stmt = db.prepare('DELETE FROM "user" WHERE username = ?');
+    return stmt.run(username);
+}
+
 export function updatePassword(id: number, password: string) {
-    const stmt = db.prepare('UPDATE user SET password = ? WHERE id = ?');
+    const stmt = db.prepare('UPDATE "user" SET password = ? WHERE id = ?');
     return stmt.run(password, id);
 }
 
@@ -44,9 +41,9 @@ export function createSession(userId: number) {
 
 export function getSession(sessionId: string) {
     const stmt = db.prepare(
-        `SELECT session.*, user.* 
-        FROM session INNER JOIN user ON session.user_id = user.id
-        WHERE session.id = ?`,
+        `SELECT "session".*, "user".* 
+        FROM "session" INNER JOIN "user" ON "session".user_id = "user".id
+        WHERE "session".id = ?`,
     );
     return stmt.get(sessionId);
 }
@@ -311,7 +308,7 @@ export function addDepartment(name: string) {
 export function removeDepartment(department_id: string) {
     try {
         const id = Number(department_id);
-        const query = db.prepare('UPDATE departments SET is_deleted = 1 WHERE id = ?');
+        const query = db.prepare('UPDATE department SET is_deleted = 1 WHERE id = ?');
         const transaction = db.transaction(() => {
             const info = query.run(id);
         });

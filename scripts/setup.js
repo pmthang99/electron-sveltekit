@@ -41,18 +41,6 @@ function setup() {
         ).run();
 
         // Create items table to manage different types of items
-        // db.prepare(
-        //     `CREATE TABLE IF NOT EXISTS items (
-        //     id INTEGER PRIMARY KEY AUTOINCREMENT,
-        //     name TEXT,
-        //     type TEXT,
-        //     author TEXT NULL,
-        //     year TEXT NULL,
-        //     note TEXT NULL,
-        //     UNIQUE (type, name)
-        // )`,
-        // ).run();
-
         db.prepare(
             `CREATE TABLE IF NOT EXISTS item (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,

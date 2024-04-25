@@ -1,12 +1,13 @@
 <script lang="ts">
     import { addPagination, addTableFilter } from 'svelte-headless-table/plugins';
     import * as Table from '$lib/components/ui/table';
-    import { Render, Subscribe, createTable } from 'svelte-headless-table';
+    import { Render, Subscribe, createRender, createTable } from 'svelte-headless-table';
     import { readable, writable } from 'svelte/store';
     import DataTablePagination from './data-table-pagination.svelte';
     import { Input } from '$lib/components/ui/input';
     import { Role } from '$lib/enum';
     import AddUserDialog from './add-user-dialog.svelte';
+    import DataTableActions from './data-table-actions.svelte';
 
     export let source: any[];
     const dataSource = writable(source);
@@ -38,6 +39,16 @@
                     default:
                         return '--';
                 }
+            },
+        }),
+        table.column({
+            accessor: ({ id }) => id,
+            header: '',
+            cell: ({ value }) => {
+                return createRender(DataTableActions, { id: value });
+            },
+            plugins: {
+                filter: { exclude: true },
             },
         }),
     ]);
