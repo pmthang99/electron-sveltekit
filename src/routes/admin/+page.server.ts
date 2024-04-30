@@ -8,10 +8,10 @@ export const load = (async ({ locals }) => {
     const { user } = locals;
     const authorized = [Role.Admin];
     if (!user) {
-        throw redirect(302, '/login?referer=/admin');
+        redirect(302, '/login?referer=/admin');
     }
     if (!authorized.includes(user.role)) {
-        throw redirect(302, '/');
+        redirect(302, '/');
     }
     const users = listUser();
 

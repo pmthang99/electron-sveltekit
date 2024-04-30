@@ -11,10 +11,10 @@ export const load = (async ({ locals, url }) => {
     const authorized = [Role.Admin];
 
     if (!user) {
-        throw redirect(302, '/login');
+        redirect(302, '/login');
     }
     if (!authorized.includes(user.role)) {
-        throw redirect(302, '/');
+        redirect(302, '/');
     }
 
     const departmentId = parseInt(url.searchParams.get('departmentId'));
