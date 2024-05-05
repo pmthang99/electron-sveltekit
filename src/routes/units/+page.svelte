@@ -13,10 +13,7 @@
             window.db.teams.add(name);
             // data = getData();
         } catch (err) {
-            console.log('Before', alertDialog);
-            console.log('Error adding new org', err);
             alertDialog = true;
-            console.log(alertDialog);
         }
     }
 </script>

@@ -1,11 +1,10 @@
 <script lang="ts">
-    import { applyAction, deserialize, enhance } from '$app/forms';
+    import { applyAction, deserialize } from '$app/forms';
     import { invalidateAll } from '$app/navigation';
     import { Button, buttonVariants } from '$lib/components/ui/button';
     import {
         Dialog,
         DialogContent,
-        DialogFooter,
         DialogHeader,
         DialogTitle,
         DialogTrigger,
@@ -19,7 +18,6 @@
     let open = false;
     let isLoading = false;
     let selectedRole;
-    // export let handleSubmit: (arg: string) => any;
     const formData = {
         username: '',
         password: '',
@@ -28,14 +26,12 @@
 
     async function handleSubmit(event: { currentTarget: EventTarget & HTMLFormElement }) {
         if (!selectedRole.value) {
-            console.log('bthc');
             return;
         }
         isLoading = true;
 
         const data = new FormData(event.currentTarget);
         data.set('role', selectedRole.value);
-        console.log(data);
 
         const response = await fetch(event.currentTarget.action, {
             method: 'POST',

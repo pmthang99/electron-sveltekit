@@ -41,7 +41,6 @@ export const actions = {
         const date = formData.get('date') as string;
         const departmentId = parseInt(formData.get('departmentId') as string);
         const itemList = JSON.parse(formData.get('itemList') as string);
-        console.log(itemList);
         const resultIds = returnItemV2(itemList, departmentId, date);
         return { success: true, data: resultIds };
     },

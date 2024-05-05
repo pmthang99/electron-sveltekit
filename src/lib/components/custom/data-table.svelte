@@ -1,15 +1,14 @@
 <script lang="ts">
+    import * as Table from '$lib/components/ui/table';
     import { Render, Subscribe, createRender, createTable } from 'svelte-headless-table';
     import { addPagination, addSelectedRows } from 'svelte-headless-table/plugins';
     import { readable } from 'svelte/store';
-    import * as Table from '$lib/components/ui/table';
     import DataTableCheckbox from './data-table-checkbox.svelte';
     import DataTablePagination from './data-table-pagination.svelte';
-    import { onDestroy, onMount } from 'svelte';
 
     let items: any[];
     let initialSelectedDataIds: { [key: string]: boolean };
-    let select;
+    let select: any;
     export { items, select, initialSelectedDataIds };
 
     const table = createTable(readable(items), {
@@ -32,9 +31,6 @@
             cell: ({ row }, { pluginStates }) => {
                 const { getRowState } = pluginStates.select;
                 const { isSelected } = getRowState(row);
-                // isSelected.set(initialSelectedDataIds[row.id] ?? false);
-                // console.log(row.id);
-                // console.log(initialSelectedDataIds[row.id]);
                 return createRender(DataTableCheckbox, {
                     checked: isSelected,
                     'aria-label': 'Select row',
@@ -77,17 +73,9 @@
 
     const { selectedDataIds } = pluginStates.select;
 
-    onMount(() => console.log('Mounted'));
-
     $: {
-        console.log(initialSelectedDataIds);
-        console.log($selectedDataIds);
         select = $selectedDataIds;
     }
-
-    onDestroy(() => {
-        console.log('Destroyed');
-    });
 
     function isEquipment() {
         return itemType === 'equipment';

@@ -26,9 +26,6 @@ export const actions = {
         const username = data.get('username');
         const password = data.get('password');
         const role = data.get('role');
-        console.log('username', username);
-        console.log('password   ', password);
-        console.log('role', role);
         if (
             typeof username !== 'string' ||
             typeof password !== 'string' ||
@@ -38,9 +35,6 @@ export const actions = {
                 message: 'Bad request',
             });
         }
-        console.log('username', username);
-        console.log('password   ', password);
-        console.log('role', role);
 
         const hashedPassword = bcrypt.hashSync(password, 10);
 
