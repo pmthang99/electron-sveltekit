@@ -1,10 +1,11 @@
 import { Role } from '$lib/enum';
-import { listItemStorage, supplyItemV2 } from '$lib/server/db';
-import { ItemType, type Item } from '$lib/server/db/types';
+import {
+    listEquipmentStorageByName,
+    listEquipmentStorageDistinct,
+    supplyEquipment,
+} from '$lib/server/db';
 import { redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-
-const itemType = ItemType.Equipment;
 
 export const load = (async ({ locals, url }) => {
     const { user } = locals;
@@ -17,12 +18,15 @@ export const load = (async ({ locals, url }) => {
         redirect(302, '/');
     }
 
-    if (url.searchParams.has('itemName')) {
-        const itemName = url.searchParams.get('itemName') as string;
-        const storageItems = listItemStorage(itemType, itemName) as Item[];
-        return { storageItems };
+    const storageNames = listEquipmentStorageDistinct();
+
+    if (url.searchParams.has('item')) {
+        const itemName = url.searchParams.get('item');
+        const storageItems = listEquipmentStorageByName(itemName);
+        return { storageItems, storageNames };
     }
-    return {};
+
+    return { storageNames };
 }) satisfies PageServerLoad;
 
 export const actions = {
@@ -31,8 +35,7 @@ export const actions = {
         const date = formData.get('date') as string;
         const departmentId = parseInt(formData.get('departmentId') as string);
         const itemList = JSON.parse(formData.get('itemList') as string);
-        const resultIds = supplyItemV2(itemList, departmentId, date);
-        // const results = supplyItem(item_id, department_id, quantity, date);
+        const resultIds = supplyEquipment(itemList, departmentId, date);
         return { success: true, data: resultIds };
     },
 } satisfies Actions;

@@ -69,6 +69,21 @@ function setup() {
         db.prepare(`CREATE INDEX IF NOT EXISTS index_name ON item (name)`).run();
 
         db.prepare(
+            `create table if not exists equipment (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT,
+                code TEXT NULL,
+                note TEXT NULL,
+                quantity INTEGER,
+                sync text null,
+                before_status text null,
+                after_status text null,
+                UNIQUE (name, code)
+            )`,
+        ).run();
+        db.prepare(`CREATE INDEX IF NOT EXISTS index_name ON equipment (name)`).run();
+
+        db.prepare(
             `CREATE TABLE IF NOT EXISTS itemdepartment (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             department_id INTEGER NULL,
@@ -82,16 +97,35 @@ function setup() {
         )`,
         ).run();
 
+        db.prepare(
+            `CREATE TABLE IF NOT EXISTS equipmentdepartment (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            department_id INTEGER NULL,
+            equipment_id INTEGER,
+            quantity INTEGER,
+            supply_date TEXT NULL,
+            return_date TEXT NULL,
+            sync text null,
+            before_status text null,
+            after_status text null,
+            FOREIGN KEY(department_id) REFERENCES department(id),
+            FOREIGN KEY(equipment_id) REFERENCES equipment(id),
+            UNIQUE (department_id, equipment_id)
+        )`,
+        ).run();
+
         // Create actionlog table to record movements of items between people
         db.prepare(
             `CREATE TABLE IF NOT EXISTS actionlog (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            item_id INTEGER,
+            item_id INTEGER NULL,
+            equipment_id INTEGER NULL,
             department_id INTEGER,
             quantity INTEGER,
             type TEXT,
             date TEXT,
-            FOREIGN KEY(item_id) REFERENCES item(id)
+            FOREIGN KEY(item_id) REFERENCES item(id),
+            FOREIGN KEY(equipment_id) REFERENCES equipment(id),
             FOREIGN KEY(department_id) REFERENCES department(id)
         )`,
         ).run();

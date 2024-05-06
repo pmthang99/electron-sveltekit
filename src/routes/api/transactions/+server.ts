@@ -8,7 +8,7 @@ export const POST: RequestHandler = async ({ request }) => {
     const action = data.action;
     const itemType = data.itemType;
     const transactionType = data.transactionType;
-    const result = viewTransactionsByIds(data.ids);
+    const result = viewTransactionsByIds(data.ids, itemType);
     if (action === 'download') {
         return new Response(
             await exportWord(

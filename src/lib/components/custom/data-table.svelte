@@ -16,57 +16,92 @@
         page: addPagination(),
     });
 
-    const itemType = items[0].type ?? 'document';
+    const itemType = items[0].type === undefined ? 'equipment' : 'document';
 
-    const columns = table.createColumns([
-        table.display({
-            id: 'select',
-            header: (_, { pluginStates }) => {
-                const { allPageRowsSelected } = pluginStates.select;
-                return createRender(DataTableCheckbox, {
-                    checked: allPageRowsSelected,
-                    'aria-label': 'Select all',
-                });
-            },
-            cell: ({ row }, { pluginStates }) => {
-                const { getRowState } = pluginStates.select;
-                const { isSelected } = getRowState(row);
-                return createRender(DataTableCheckbox, {
-                    checked: isSelected,
-                    'aria-label': 'Select row',
-                    class: 'translate-y-[2px]',
-                });
-            },
-        }),
-        table.column({
-            accessor: 'name',
-            header: isEquipment() ? 'Trang bị' : 'Tài liệu',
-        }),
-        table.column({
-            accessor: 'code',
-            header: isEquipment() ? 'Mã trang bị' : 'Mã tài liệu',
-            cell: ({ value }) => value ?? '--',
-        }),
-        table.column({
-            accessor: 'quantity',
-            header: 'Số lượng',
-        }),
-        table.column({
-            accessor: 'author',
-            header: isEquipment() ? 'Nước sản xuất' : 'Tác giả',
-            cell: ({ value }) => value ?? '--',
-        }),
-        table.column({
-            accessor: 'year',
-            header: 'Năm',
-            cell: ({ value }) => value ?? '--',
-        }),
-        table.column({
-            accessor: 'note',
-            header: 'Ghi chú',
-            cell: ({ value }) => value ?? '--',
-        }),
-    ]);
+    const columns = !isEquipment()
+        ? table.createColumns([
+              table.display({
+                  id: 'select',
+                  header: (_, { pluginStates }) => {
+                      const { allPageRowsSelected } = pluginStates.select;
+                      return createRender(DataTableCheckbox, {
+                          checked: allPageRowsSelected,
+                          'aria-label': 'Select all',
+                      });
+                  },
+                  cell: ({ row }, { pluginStates }) => {
+                      const { getRowState } = pluginStates.select;
+                      const { isSelected } = getRowState(row);
+                      return createRender(DataTableCheckbox, {
+                          checked: isSelected,
+                          'aria-label': 'Select row',
+                          class: 'translate-y-[2px]',
+                      });
+                  },
+              }),
+              table.column({
+                  accessor: 'name',
+                  header: 'Tài liệu',
+              }),
+              table.column({
+                  accessor: 'code',
+                  header: 'Mã tài liệu',
+                  cell: ({ value }) => value ?? '--',
+              }),
+              table.column({
+                  accessor: 'quantity',
+                  header: 'Số lượng',
+              }),
+              table.column({
+                  accessor: 'author',
+                  header: 'Tác giả',
+                  cell: ({ value }) => value ?? '--',
+              }),
+              table.column({
+                  accessor: 'year',
+                  header: 'Năm',
+                  cell: ({ value }) => value ?? '--',
+              }),
+              table.column({
+                  accessor: 'note',
+                  header: 'Ghi chú',
+                  cell: ({ value }) => value ?? '--',
+              }),
+          ])
+        : table.createColumns([
+              table.display({
+                  id: 'select',
+                  header: (_, { pluginStates }) => {
+                      const { allPageRowsSelected } = pluginStates.select;
+                      return createRender(DataTableCheckbox, {
+                          checked: allPageRowsSelected,
+                          'aria-label': 'Select all',
+                      });
+                  },
+                  cell: ({ row }, { pluginStates }) => {
+                      const { getRowState } = pluginStates.select;
+                      const { isSelected } = getRowState(row);
+                      return createRender(DataTableCheckbox, {
+                          checked: isSelected,
+                          'aria-label': 'Select row',
+                          class: 'translate-y-[2px]',
+                      });
+                  },
+              }),
+              table.column({
+                  accessor: 'name',
+                  header: 'Trang bị',
+              }),
+              table.column({
+                  accessor: 'code',
+                  header: 'Mã trang bị',
+                  cell: ({ value }) => value ?? '--',
+              }),
+              table.column({
+                  accessor: 'quantity',
+                  header: 'Số lượng',
+              }),
+          ]);
 
     const tableModel = table.createViewModel(columns);
     const { headerRows, pageRows, pluginStates, tableAttrs, tableBodyAttrs } = tableModel;

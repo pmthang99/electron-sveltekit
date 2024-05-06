@@ -64,7 +64,7 @@
     }
 
     async function onSave() {
-        const date = input.date.toString();
+        const date = inputDate.toString();
         const departmentId = inputDepartment.value;
         let selectedItems: { id: number; quantity: number }[];
         if (input.quantity > 0) {
@@ -107,7 +107,13 @@
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ ids: resultIds, action: 'view' }),
+                body: JSON.stringify({
+                    ids: resultIds,
+                    department: inputDepartment.label,
+                    action: 'view',
+                    transactionType: 'supply',
+                    itemType: 'document',
+                }),
             });
             resultDetails = (await response.json()).result;
         }
@@ -181,7 +187,7 @@
                     class={cn(
                         buttonVariants({ variant: 'outline' }),
                         'w-[300px] justify-start pl-4 text-left font-normal',
-                        !input.date && 'text-muted-foreground',
+                        !inputDate && 'text-muted-foreground',
                     )}
                 >
                     {inputDate ? df.format(inputDate.toDate(getLocalTimeZone())) : 'Pick a date'}

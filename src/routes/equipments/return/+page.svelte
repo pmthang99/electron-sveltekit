@@ -5,6 +5,7 @@
     import DialogSelectItem from '$lib/components/custom/dialog-select-item.svelte';
     import { Button, buttonVariants } from '$lib/components/ui/button';
     import { Calendar } from '$lib/components/ui/calendar';
+    import { Input } from '$lib/components/ui/input';
     import { Label } from '$lib/components/ui/label';
     import * as Popover from '$lib/components/ui/popover';
     import {
@@ -15,13 +16,7 @@
         SelectValue,
     } from '$lib/components/ui/select';
     import { cn } from '$lib/utils';
-    import {
-        CalendarDate,
-        DateFormatter,
-        getLocalTimeZone,
-        today,
-        type DateValue,
-    } from '@internationalized/date';
+    import { CalendarDate, DateFormatter, getLocalTimeZone, today } from '@internationalized/date';
     import type { ActionResult } from '@sveltejs/kit';
     import { CalendarIcon } from 'lucide-svelte';
     import { onMount, type ComponentEvents } from 'svelte';
@@ -29,46 +24,68 @@
     import type { PageData } from './$types';
     export let data: PageData;
 
-    let selectedIndexes = [];
+    let selected = [];
 
-    let resultIds = null;
-    let resultDetails = [];
+    let resultIds: any;
+    let resultDetails: any[];
 
     const df = new DateFormatter('vi-VN', {
         dateStyle: 'long',
     });
 
-    let placeholder: DateValue = today(getLocalTimeZone());
+    let placeholder = today(getLocalTimeZone());
 
     let input = {
         date: placeholder,
         org: null,
         item: null,
-        quantity: 1,
+        quantity: 0,
+        after_status: '',
     };
+
+    let inputDate = placeholder;
     let inputItemName = undefined;
     let inputDepartment = undefined;
 
     let viewDialog = false;
 
     function onReset() {
+        inputDate = placeholder;
+        inputItemName = null;
+        inputDepartment = null;
         input = {
             date: placeholder,
             org: null,
             item: null,
-            quantity: 1,
+            quantity: 0,
         };
 
         resultIds = null;
+        goto($page.url.pathname);
     }
 
     async function onSave() {
-        const date = input.date.toString();
+        const date = inputDate.toString();
         const departmentId = inputDepartment.value;
-        const selectedItems = selectedIndexes.map((idx) => {
-            const item = data.items[idx];
-            return item;
-        });
+        let selectedItems: any[];
+        if (input.quantity > 0) {
+            selectedItems = [
+                {
+                    id: data.items[0].id,
+                    quantity: input.quantity,
+                    after_status: input.after_status,
+                },
+            ];
+        } else {
+            selectedItems = selected.map((idx) => {
+                const item = data.items[idx];
+                return {
+                    id: item.id,
+                    quantity: item.quantity,
+                    after_status: input.after_status,
+                };
+            });
+        }
 
         const formData = new FormData();
         formData.append('date', date);
@@ -80,37 +97,67 @@
             body: formData,
         });
         const result: ActionResult = deserialize(await response.text());
-        // const data = await response.json();
-        // resultIds = data.data;
+
+        if (result.type === 'success') {
+            resultIds = result.data.data;
+        }
     }
 
     async function onView() {
+        if (!resultDetails) {
+            const response = await fetch('/api/transactions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    ids: resultIds,
+                    department: inputDepartment.label,
+                    action: 'view',
+                    transactionType: 'return',
+                    itemType: 'equipment',
+                }),
+            });
+            resultDetails = (await response.json()).result;
+        }
+        viewDialog = true;
+    }
+
+    async function onPrint() {
         const response = await fetch('/api/transactions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ ids: resultIds }),
+            body: JSON.stringify({
+                ids: resultIds,
+                department: inputDepartment.label,
+                action: 'download',
+                transactionType: 'return',
+                itemType: 'equipment',
+            }),
         });
-        resultDetails = (await response.json()).result;
-        viewDialog = true;
-    }
 
-    function onPrint() {}
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'document.docx';
+        a.click();
+        URL.revokeObjectURL(url);
+        a.remove();
+    }
 
     function onChangeValue() {
         const searchParams = new URLSearchParams($page.url.searchParams.toString());
-        if (inputItemName) {
-            searchParams.set('itemName', inputItemName.value);
-        }
         if (inputDepartment) {
             searchParams.set('departmentId', inputDepartment.value);
         }
+        if (inputItemName) {
+            searchParams.set('item', inputItemName.value);
+            selected.splice(0, selected.length);
+        }
         goto(`?${searchParams.toString()}`);
-    }
-
-    function handleConfirmEvent(event: ComponentEvents<DialogSelectItem>['confirm']) {
-        selectedIndexes = event.detail;
     }
 
     onMount(() => {
@@ -124,33 +171,37 @@
                 label: departmentName.name,
             };
         }
-        if ($page.url.searchParams.has('itemName')) {
+        if ($page.url.searchParams.has('item')) {
             inputItemName = {
-                value: $page.url.searchParams.get('itemName'),
-                label: $page.url.searchParams.get('itemName'),
+                value: $page.url.searchParams.get('item'),
+                label: $page.url.searchParams.get('item'),
             };
         }
     });
+
+    function handleConfirmEvent(event: ComponentEvents<DialogSelectItem>['confirm']) {
+        selected = event.detail;
+    }
 </script>
 
 <div class="flex justify-center">
     <div class="flex flex-col">
-        <div class="mb-6 grid gap-2">
+        <div class="mb-6 mx-auto grid gap-2">
             <Label class="mb-2">Ngày trả</Label>
             <Popover.Root>
                 <Popover.Trigger
                     class={cn(
                         buttonVariants({ variant: 'outline' }),
-                        'w-[280px] justify-start pl-4 text-left font-normal',
-                        !input.date && 'text-muted-foreground',
+                        'w-[300px] justify-start pl-4 text-left font-normal',
+                        !inputDate && 'text-muted-foreground',
                     )}
                 >
-                    {input.date ? df.format(input.date.toDate(getLocalTimeZone())) : 'Pick a date'}
+                    {inputDate ? df.format(inputDate.toDate(getLocalTimeZone())) : 'Pick a date'}
                     <CalendarIcon class="ml-auto h-4 w-4 opacity-50" />
                 </Popover.Trigger>
                 <Popover.Content class="w-auto p-0" side="top">
                     <Calendar
-                        bind:value={input.date}
+                        bind:value={inputDate}
                         minValue={new CalendarDate(1900, 1, 1)}
                         maxValue={today(getLocalTimeZone())}
                         initialFocus
@@ -158,7 +209,7 @@
                 </Popover.Content>
             </Popover.Root>
         </div>
-        <div class="mb-6">
+        <div class="mb-6 mx-auto">
             <Label class="mb-2 block">Đơn vị</Label>
             <Select
                 selected={inputDepartment}
@@ -167,18 +218,18 @@
                     onChangeValue();
                 }}
             >
-                <SelectTrigger class="w-[280px]">
+                <SelectTrigger class="w-[300px]">
                     <SelectValue placeholder="Chọn đơn vị" />
                 </SelectTrigger>
                 <SelectContent>
-                    {#each data.departments as dept}
-                        <SelectItem value={dept.id}>{dept.name}</SelectItem>
+                    {#each data.departments as department}
+                        <SelectItem value={department.id} label={department.name} />
                     {/each}
                 </SelectContent>
             </Select>
         </div>
-        <div class="mb-6">
-            <Label class="mb-2 block">Tài liệu</Label>
+        <div class="mb-6 mx-auto">
+            <Label class="mb-2 block">Trang bị</Label>
             <Select
                 selected={inputItemName}
                 onSelectedChange={(value) => {
@@ -186,32 +237,40 @@
                     onChangeValue();
                 }}
             >
-                <SelectTrigger class="w-[280px]">
-                    <SelectValue placeholder="Chọn tài liệu" />
+                <SelectTrigger class="w-[300px]">
+                    <SelectValue placeholder="Chọn trang bị" />
                 </SelectTrigger>
                 <SelectContent>
                     {#each data.itemDepartmentNameList as item}
-                        <SelectItem value={item.name}>{item.name}</SelectItem>
+                        <SelectItem value={item} label={item} />
                     {/each}
                 </SelectContent>
             </Select>
         </div>
-        <div class="mb-6">
+        <div class="mb-6 mx-auto">
             <Label for="quantity" class="mb-2 block">Số lượng</Label>
-            <DialogSelectItem on:confirm={handleConfirmEvent} items={data.items} />
+            {#if data.items && data.items.length > 1}
+                <DialogSelectItem on:confirm={handleConfirmEvent} items={data.items} />
+            {:else}
+                <Input class="w-[300px]" type="number" id="quantity" bind:value={input.quantity} />
+            {/if}
+        </div>
+        <div class="mb-6 mx-auto">
+            <Label for="quantity" class="mb-2 block">Tình trạng khi trả</Label>
+            <Input class="w-[300px]" bind:value={input.after_status} />
         </div>
         <div class="mb-6 flex gap-20">
             <div class="flex flex-1 justify-center gap-10">
                 <Button on:click={onReset}>Reset</Button>
-                <Button on:click={onSave}>Save</Button>
+                <Button disabled={resultIds} on:click={onSave}>Save</Button>
             </div>
             <div class="flex flex-1 justify-center gap-10">
                 <Button disabled={!resultIds} on:click={onView}>View</Button>
-                <Button disabled on:click={onPrint}>Print</Button>
+                <Button disabled={!resultIds} on:click={onPrint}>Print</Button>
             </div>
         </div>
-        {#key viewDialog}
+        {#if resultDetails}
             <ViewDetailDialog bind:open={viewDialog} bind:dataSource={resultDetails} />
-        {/key}
+        {/if}
     </div>
 </div>

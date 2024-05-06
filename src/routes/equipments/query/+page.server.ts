@@ -1,10 +1,7 @@
 import { Role } from '$lib/enum';
-import { listItemDepartment } from '$lib/server/db';
-import { ItemType } from '$lib/server/db/types';
+import { listEquipmentDepartmentByName } from '$lib/server/db';
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-
-const itemType = ItemType.Equipment;
 
 export const load = (async ({ locals, url }) => {
     const user = locals.user;
@@ -21,7 +18,7 @@ export const load = (async ({ locals, url }) => {
     const departmentId = parseInt(url.searchParams.get('departmentId') as string);
     if (departmentId && itemName) {
         const full = true;
-        const result = listItemDepartment(itemType, departmentId, itemName, full);
+        const result = listEquipmentDepartmentByName(departmentId, itemName, full);
         return { result };
     }
     return {};

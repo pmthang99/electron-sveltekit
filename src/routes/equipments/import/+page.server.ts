@@ -1,11 +1,8 @@
-import { importItems, listItem } from '$lib/server/db';
-import { ItemType } from '$lib/server/db/types';
+import { Role } from '$lib/enum';
+import { importEquipment, listEquipment } from '$lib/server/db';
 import { fail, redirect } from '@sveltejs/kit';
 import * as xlsx from 'xlsx';
 import type { PageServerLoad } from './$types';
-import { Role } from '$lib/enum';
-
-const itemType = ItemType.Equipment;
 
 export const load = (({ locals }) => {
     const { user } = locals;
@@ -18,7 +15,7 @@ export const load = (({ locals }) => {
         redirect(302, '/');
     }
 
-    const items = listItem(itemType);
+    const items = listEquipment();
     return {
         items,
     };
@@ -53,28 +50,27 @@ function _handleFileUpload(file: File) {
         const nameCol = headerRow.findIndex((e: string) => e === 'Trang bị');
         const codeCol = headerRow.findIndex((e: string) => e === 'Mã trang bị') ?? null;
         const quantityCol = headerRow.findIndex((e: string) => e === 'Số lượng');
-        const authorCol = headerRow.findIndex((e: string) => e === 'Nước sản xuất');
-        const yearCol = headerRow.findIndex((e: string) => e === 'Năm sản xuất');
-        const noteCol = headerRow.findIndex((e: string) => e === 'Ghi chú');
+        const syncCol = headerRow.findIndex((e: string) => e === 'Đồng bộ');
+        const beforeStatusCol = headerRow.findIndex((e: string) => e === 'Tình trạng khi cấp');
+        const afterStatusCol = headerRow.findIndex((e: string) => e === 'Tình trạng khi trả');
 
         const itemList = [];
         for (const row of data) {
             const name = row[nameCol];
             const code = codeCol ? row[codeCol] : null;
             const quantity = row[quantityCol];
-            const author = authorCol ? row[authorCol] : null;
-            const year = yearCol ? row[yearCol] : null;
-            const note = noteCol ? row[noteCol] : null;
+            const sync = syncCol ? row[syncCol] : null;
+            const before_status = beforeStatusCol ? row[beforeStatusCol] : null;
+            const after_status = afterStatusCol ? row[afterStatusCol] : null;
             itemList.push({
                 name,
-                type: itemType,
                 code,
                 quantity,
-                author,
-                year,
-                note,
+                sync,
+                before_status,
+                after_status,
             });
         }
-        importItems(itemList);
+        importEquipment(itemList);
     });
 }
