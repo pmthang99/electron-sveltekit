@@ -50,48 +50,52 @@
         },
         {
             title: 'Tài liệu',
-            href: '/documents/',
+            href: '/document/',
             roles: [Role.Admin, Role.User],
             children: [
                 {
                     title: 'Nhập tài liệu',
-                    href: '/documents/import',
+                    href: '/document/import',
                     roles: [Role.Admin],
                 },
                 {
                     title: 'Cấp tài liệu',
-                    href: '/documents/supply',
+                    href: '/document/supply',
                     roles: [Role.Admin],
                 },
                 {
                     title: 'Trả tài liệu',
-                    href: '/documents/return',
+                    href: '/document/return',
                     roles: [Role.Admin],
                 },
-                { title: 'Tra cứu', href: '/documents/query', roles: [Role.Admin, Role.User] },
+                { title: 'Tra cứu', href: '/document/query', roles: [Role.Admin, Role.User] },
             ],
         },
         {
             title: 'Tài liệu mật',
-            href: '/secrets/',
+            href: '/document/secret/',
             roles: [Role.Admin, Role.User],
             children: [
                 {
                     title: 'Nhập tài liệu mật',
-                    href: '/secrets/import',
+                    href: '/document/secret/import',
                     roles: [Role.Admin],
                 },
                 {
                     title: 'Cấp tài liệu mật',
-                    href: '/secrets/supply',
+                    href: '/document/secret/supply',
                     roles: [Role.Admin],
                 },
                 {
                     title: 'Trả tài liệu mật',
-                    href: '/secrets/return',
+                    href: '/document/secret/return',
                     roles: [Role.Admin],
                 },
-                { title: 'Tra cứu', href: '/secrets/query', roles: [Role.Admin, Role.User] },
+                {
+                    title: 'Tra cứu',
+                    href: '/document/secret/query',
+                    roles: [Role.Admin, Role.User],
+                },
             ],
         },
         {
