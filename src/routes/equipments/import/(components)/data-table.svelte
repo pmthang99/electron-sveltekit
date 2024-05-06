@@ -26,7 +26,7 @@
         table.column({
             accessor: 'code',
             header: 'Mã trang bị',
-            cell: ({ value }) => value ?? '--',
+            cell: ({ value }) => value ?? '',
         }),
         table.column({
             accessor: 'quantity',
@@ -36,22 +36,28 @@
             },
         }),
         table.column({
-            accessor: 'author',
-            header: 'Nước sản xuất',
-            cell: ({ value }) => value ?? '--',
-        }),
-        table.column({
-            accessor: 'year',
-            header: 'Năm sản xuất',
-            cell: ({ value }) => value ?? '--',
+            accessor: 'sync',
+            header: 'Đồng bộ',
+            cell: ({ value }) => value ?? '',
             plugins: {
                 filter: { exclude: true },
             },
         }),
         table.column({
-            accessor: 'note',
-            header: 'Ghi chú',
-            cell: ({ value }) => value ?? '--',
+            accessor: 'before_status',
+            header: 'Tình trạng khi cấp',
+            cell: ({ value }) => value ?? '',
+            plugins: {
+                filter: { exclude: true },
+            },
+        }),
+        table.column({
+            accessor: 'after_status',
+            header: 'Tình trạng khi trả',
+            cell: ({ value }) => value ?? '',
+            plugins: {
+                filter: { exclude: true },
+            },
         }),
     ]);
 

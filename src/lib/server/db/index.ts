@@ -1,11 +1,11 @@
 import Database from 'better-sqlite3';
 import { DB_PATH } from '$env/static/private';
 import {
+    ItemType,
     TransactionType,
     type Department,
     type Inventory,
     type Item,
-    type ItemType,
     type Transaction,
     type User,
 } from './types';
@@ -14,6 +14,8 @@ const db = new Database(DB_PATH, { verbose: console.log });
 db.pragma('journal_mode = WAL');
 
 export default db;
+
+export * from './equipment';
 
 // USERS
 export function listUser() {
@@ -533,10 +535,21 @@ export function viewTransactions(department_id: number, type: TransactionType) {
     return stmt.all(department_id, type) as Transaction[];
 }
 
-export function viewTransactionsByIds(ids: number[]) {
-    const sql = `SELECT item.*, log.* 
+export function viewTransactionsByIds(ids: number[], itemType: ItemType) {
+    let sql;
+    if (itemType === ItemType.Equipment) {
+        sql = `SELECT item.name, item.code, log.*, ed.sync, ed.before_status, ed.after_status
+        FROM actionlog log
+        INNER JOIN equipment item
+        ON log.equipment_id = item.id
+        INNER JOIN equipmentdepartment ed
+        ON log.equipment_id = ed.equipment_id AND log.department_id = ed.department_id
+        WHERE log.id = ?`;
+    } else {
+        sql = `SELECT item.*, log.* 
         FROM actionlog log INNER JOIN item ON log.item_id = item.id
         WHERE log.id = ?`;
+    }
     const stmt = db.prepare(sql);
     const myTransaction = db.transaction((ids: number[]) => {
         return ids.map((id) => stmt.get(id));

@@ -37,19 +37,19 @@
             header: 'Số lượng',
         }),
         table.column({
-            accessor: 'author',
-            header: 'Tác giả',
-            cell: ({ value }) => value ?? '--',
+            accessor: 'sync',
+            header: 'Đồng bộ',
+            cell: ({ value }) => value ?? '',
         }),
         table.column({
-            accessor: 'year',
-            header: 'Năm',
-            cell: ({ value }) => value ?? '--',
+            accessor: 'before_status',
+            header: 'Tình trạng khi cấp',
+            cell: ({ value }) => value ?? '',
         }),
         table.column({
-            accessor: 'note',
-            header: 'Ghi chú',
-            cell: ({ value }) => value ?? '--',
+            accessor: 'after_status',
+            header: 'Tình trạng khi trả',
+            cell: ({ value }) => value ?? '',
         }),
         table.column({
             accessor: 'supply_date',
@@ -123,7 +123,7 @@
                 </Select.Trigger>
                 <Select.Content>
                     {#each data.itemNameList as item}
-                        <Select.Item value={item.name}>{item.name}</Select.Item>
+                        <Select.Item value={item} label={item} />
                     {/each}
                 </Select.Content>
             </Select.Root>

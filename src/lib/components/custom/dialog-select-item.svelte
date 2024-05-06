@@ -47,7 +47,7 @@
     <Dialog.Trigger
         class={cn(
             buttonVariants({ variant: 'outline' }),
-            'w-[280px] justify-start pl-4 text-left font-normal',
+            'w-[300px] justify-start pl-4 text-left font-normal',
         )}
     >
         {selectedIds?.length ?? 0}
