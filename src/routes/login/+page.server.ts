@@ -50,6 +50,6 @@ export const actions = {
         // const sessionId = users.createSession(user);
         // cookies.set('sessionid', sessionId, { path: '/', httpOnly: true, sameSite: 'strict' });
 
-        throw redirect(302, '/');
+        redirect(302, '/');
     },
 } satisfies Actions;

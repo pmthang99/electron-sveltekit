@@ -57,9 +57,9 @@ export function listItem(type: ItemType) {
     return stmt.all(type);
 }
 
-export function listItemName(type: ItemType) {
+export function listItemName(type: ItemType): { name: string }[] {
     const stmt = db.prepare(`SELECT DISTINCT name FROM item WHERE type = ?`);
-    return stmt.all(type);
+    return stmt.all(type) as { name: string }[];
 }
 
 export function listItemV2(type: ItemType, name: string) {
@@ -67,7 +67,7 @@ export function listItemV2(type: ItemType, name: string) {
     return stmt.all(name, type);
 }
 
-export function listItemStorage(type: ItemType, name?: string) {
+export function listItemStorage(type: ItemType, name?: string): Item[] {
     let query = `SELECT * FROM item WHERE type = ? AND quantity > 0`;
     let params: string[] = [type];
     if (name) {
@@ -75,16 +75,16 @@ export function listItemStorage(type: ItemType, name?: string) {
         params.push(name);
     }
     const stmt = db.prepare(query);
-    return stmt.all(params);
+    return stmt.all(params) as Item[];
 }
 
-export function listItemStorageName(type: ItemType) {
+export function listItemStorageName(type: ItemType): string[] {
     const stmt = db.prepare(
         `SELECT DISTINCT i.name
         FROM item i
         WHERE i.type = ? AND i.quantity > 0`,
     );
-    return stmt.all(type);
+    return stmt.all(type).map((item: Item) => item.name);
 }
 
 export function listItemDepartment(
@@ -534,12 +534,13 @@ export function viewTransactions(department_id: number, type: TransactionType) {
 }
 
 export function viewTransactionsByIds(ids: number[]) {
-    const sql = `SELECT items.name, txn.* 
-        FROM transactions txn INNER JOIN items ON txn.item_id = items.id
-        WHERE txn.id = ?`;
+    const sql = `SELECT item.*, log.* 
+        FROM actionlog log INNER JOIN item ON log.item_id = item.id
+        WHERE log.id = ?`;
     const stmt = db.prepare(sql);
     const myTransaction = db.transaction((ids: number[]) => {
         return ids.map((id) => stmt.get(id));
     });
-    return myTransaction(ids) as Transaction[];
+    const result = myTransaction(ids) as Transaction[];
+    return result;
 }

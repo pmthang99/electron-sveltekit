@@ -64,7 +64,7 @@
         justify-content: space-between;
     }
 
-    .corner {
+    /* .corner {
         width: 3em;
         height: 3em;
     }
@@ -81,7 +81,7 @@
         width: 2em;
         height: 2em;
         object-fit: contain;
-    }
+    } */
 
     nav {
         display: flex;
@@ -119,7 +119,7 @@
         height: 100%;
     }
 
-    li[aria-current='page']::before {
+    /* li[aria-current='page']::before {
         --size: 6px;
         content: '';
         width: 0;
@@ -129,7 +129,7 @@
         left: calc(50% - var(--size));
         border: var(--size) solid transparent;
         border-top: var(--size) solid var(--color-theme-1);
-    }
+    } */
 
     nav a,
     nav button {

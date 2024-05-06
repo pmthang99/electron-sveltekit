@@ -96,9 +96,7 @@
         viewDialog = true;
     }
 
-    function onPrint() {
-        console.log('Print');
-    }
+    function onPrint() {}
 
     function onChangeValue() {
         const searchParams = new URLSearchParams($page.url.searchParams.toString());
@@ -109,7 +107,6 @@
             searchParams.set('departmentId', inputDepartment.value);
         }
         goto(`?${searchParams.toString()}`);
-        console.log(data.itemDepartmentNameList);
     }
 
     function handleConfirmEvent(event: ComponentEvents<DialogSelectItem>['confirm']) {
@@ -133,12 +130,7 @@
                 label: $page.url.searchParams.get('itemName'),
             };
         }
-        console.log(data.itemDepartmentNameList);
     });
-
-    $: {
-        console.log(inputDepartment);
-    }
 </script>
 
 <div class="flex justify-center">

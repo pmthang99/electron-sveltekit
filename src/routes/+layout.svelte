@@ -12,7 +12,6 @@
     import CardHeader from '$lib/components/ui/card/card-header.svelte';
     import { writable, type Writable } from 'svelte/store';
     import { Role } from '$lib/enum';
-    import path from 'path';
 
     export let data: LayoutServerData;
     const { user } = data;
@@ -51,48 +50,52 @@
         },
         {
             title: 'Tài liệu',
-            href: '/documents/',
+            href: '/document/',
             roles: [Role.Admin, Role.User],
             children: [
                 {
                     title: 'Nhập tài liệu',
-                    href: '/documents/import',
+                    href: '/document/import',
                     roles: [Role.Admin],
                 },
                 {
                     title: 'Cấp tài liệu',
-                    href: '/documents/supply',
+                    href: '/document/supply',
                     roles: [Role.Admin],
                 },
                 {
                     title: 'Trả tài liệu',
-                    href: '/documents/return',
+                    href: '/document/return',
                     roles: [Role.Admin],
                 },
-                { title: 'Tra cứu', href: '/documents/query', roles: [Role.Admin, Role.User] },
+                { title: 'Tra cứu', href: '/document/query', roles: [Role.Admin, Role.User] },
             ],
         },
         {
             title: 'Tài liệu mật',
-            href: '/secrets/',
+            href: '/document/secret/',
             roles: [Role.Admin, Role.User],
             children: [
                 {
                     title: 'Nhập tài liệu mật',
-                    href: '/secrets/import',
+                    href: '/document/secret/import',
                     roles: [Role.Admin],
                 },
                 {
                     title: 'Cấp tài liệu mật',
-                    href: '/secrets/supply',
+                    href: '/document/secret/supply',
                     roles: [Role.Admin],
                 },
                 {
                     title: 'Trả tài liệu mật',
-                    href: '/secrets/return',
+                    href: '/document/secret/return',
                     roles: [Role.Admin],
                 },
-                { title: 'Tra cứu', href: '/secrets/query', roles: [Role.Admin, Role.User] },
+                {
+                    title: 'Tra cứu',
+                    href: '/document/secret/query',
+                    roles: [Role.Admin, Role.User],
+                },
             ],
         },
         {
@@ -152,8 +155,12 @@
         <Header {user} />
         <div class="flex flex-1">
             <div class="w-[100%] pt-[14%] grid lg:grid-cols-5">
-                <SideBar class="bg-background min-h-[100%]" {items} {user}></SideBar>
-                <div class="col-span-3 lg:col-span-4 lg:border-l ml-15">
+                <SideBar
+                    class="rounded-lg border-t border-r bg-background min-h-[100%]"
+                    {items}
+                    {user}
+                ></SideBar>
+                <div class="col-span-3 lg:col-span-4 ml-15">
                     <div class="container">
                         <Card>
                             <CardHeader class="items-center ">

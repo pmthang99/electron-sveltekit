@@ -2,7 +2,7 @@
     import { Dialog, DialogContent, DialogHeader, DialogTitle } from '$lib/components/ui/dialog';
     import * as Table from '$lib/components/ui/table';
     import { Render, Subscribe, createTable } from 'svelte-headless-table';
-    import { readable, writable } from 'svelte/store';
+    import { writable } from 'svelte/store';
 
     export let dataSource: Array<any>;
     export let open: boolean;

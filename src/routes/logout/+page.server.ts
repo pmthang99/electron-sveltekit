@@ -18,6 +18,6 @@ export const actions = {
         // event.locals.user = null;
         // event.locals.session = null;
 
-        throw redirect(303, '/login');
+        redirect(303, '/login');
     },
 } satisfies Actions;

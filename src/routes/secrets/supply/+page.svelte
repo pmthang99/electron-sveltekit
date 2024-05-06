@@ -91,10 +91,6 @@
         // });
         // const data = await response.json();
         // resultIds = data.data;
-        console.log(result.type);
-        if (result.type === 'success') {
-            console.log(result.data.data);
-        }
     }
 
     async function onView() {
@@ -109,9 +105,7 @@
         viewDialog = true;
     }
 
-    function onPrint() {
-        console.log('Print');
-    }
+    function onPrint() {}
 
     function triggerFetch() {
         if (inputItemName) {

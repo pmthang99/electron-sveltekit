@@ -4,9 +4,9 @@ import { ItemType, type Item } from '$lib/server/db/types';
 import { redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
-const itemType = ItemType.Document;
+export const load = (async ({ locals, params, url }) => {
+    const itemType = params.type === 'secret' ? ItemType.Secret : ItemType.Document;
 
-export const load = (async ({ locals, url }) => {
     const { user } = locals;
     const authorized = [Role.Admin];
 

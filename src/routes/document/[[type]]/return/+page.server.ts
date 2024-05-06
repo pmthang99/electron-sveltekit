@@ -1,12 +1,12 @@
 import { Role } from '$lib/enum';
-import { listItemStorage, listItemStorageName, supplyItemV2 } from '$lib/server/db';
+import { listItemDepartment, listItemDepartmentName, returnItemV2 } from '$lib/server/db';
 import { ItemType, type Item } from '$lib/server/db/types';
 import { redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
-const itemType = ItemType.Document;
+export const load = (async ({ locals, params, url }) => {
+    const itemType = params.type === 'secret' ? ItemType.Secret : ItemType.Document;
 
-export const load = (async ({ locals, url }) => {
     const { user } = locals;
     const authorized = [Role.Admin];
 
@@ -17,15 +17,23 @@ export const load = (async ({ locals, url }) => {
         redirect(302, '/');
     }
 
-    const storageNames = listItemStorageName(itemType);
-
-    if (url.searchParams.has('item')) {
-        const itemName = url.searchParams.get('item');
-        const storageItems = listItemStorage(itemType, itemName) as Item[];
-        return { storageItems, storageNames };
+    const departmentId = parseInt(url.searchParams.get('departmentId'));
+    const itemName = url.searchParams.get('item');
+    if (!departmentId) {
+        return {};
     }
 
-    return { storageNames };
+    const itemDepartmentNameList = listItemDepartmentName(itemType, departmentId) as {
+        name: string;
+    }[];
+
+    if (!itemName) {
+        return {
+            itemDepartmentNameList,
+        };
+    }
+    const items = listItemDepartment(itemType, departmentId, itemName) as Item[];
+    return { items, itemDepartmentNameList };
 }) satisfies PageServerLoad;
 
 export const actions = {
@@ -34,7 +42,7 @@ export const actions = {
         const date = formData.get('date') as string;
         const departmentId = parseInt(formData.get('departmentId') as string);
         const itemList = JSON.parse(formData.get('itemList') as string);
-        const resultIds = supplyItemV2(itemList, departmentId, date);
+        const resultIds = returnItemV2(itemList, departmentId, date);
         return { success: true, data: resultIds };
     },
 } satisfies Actions;

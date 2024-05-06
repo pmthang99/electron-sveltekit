@@ -7,7 +7,7 @@ export const load = (async ({ depends, locals }) => {
     const { user } = locals;
     const authorized = [Role.Admin];
     if (!user || !authorized.includes(user.role)) {
-        throw redirect(302, '/login?referer=/units');
+        redirect(302, '/login?referer=/units');
     }
     const departments = listDepartment();
     depends('app:refresh');

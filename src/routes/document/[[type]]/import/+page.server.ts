@@ -5,9 +5,7 @@ import * as xlsx from 'xlsx';
 import type { PageServerLoad } from './$types';
 import { Role } from '$lib/enum';
 
-const itemType = ItemType.Document;
-
-export const load = (({ locals }) => {
+export const load = (({ locals, params }) => {
     const { user } = locals;
     const authorized = [Role.Admin];
 
@@ -18,6 +16,7 @@ export const load = (({ locals }) => {
         redirect(302, '/');
     }
 
+    const itemType = params.type === 'secret' ? ItemType.Secret : ItemType.Document;
     const items = listItem(itemType);
     return {
         items,
@@ -25,7 +24,8 @@ export const load = (({ locals }) => {
 }) satisfies PageServerLoad;
 
 export const actions = {
-    default: async ({ request }) => {
+    default: async ({ params, request }) => {
+        const itemType = params.type === 'secret' ? ItemType.Secret : ItemType.Document;
         const formData = await request.formData();
         const file = formData.get('file') as File;
         if (!file.name || file.name === 'undefined') {
@@ -35,7 +35,7 @@ export const actions = {
             });
         }
 
-        _handleFileUpload(file);
+        _handleFileUpload(file, itemType);
 
         return {
             success: true,
@@ -43,7 +43,7 @@ export const actions = {
     },
 };
 
-function _handleFileUpload(file: File) {
+function _handleFileUpload(file: File, itemType: ItemType) {
     file.arrayBuffer().then((buffer) => {
         const workbook = xlsx.read(buffer);
         const worksheet = workbook.Sheets[workbook.SheetNames[0]];

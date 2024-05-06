@@ -11,10 +11,10 @@ export const load = (async ({ locals, url }) => {
     const authorized = [Role.Admin];
 
     if (!user) {
-        throw redirect(302, '/login');
+        redirect(302, '/login');
     }
     if (!authorized.includes(user.role)) {
-        throw redirect(302, '/');
+        redirect(302, '/');
     }
 
     if (url.searchParams.has('itemName')) {
@@ -31,8 +31,6 @@ export const actions = {
         const date = formData.get('date') as string;
         const departmentId = parseInt(formData.get('departmentId') as string);
         const itemList = JSON.parse(formData.get('itemList') as string);
-        console.log(departmentId);
-        console.log(itemList);
         const resultIds = supplyItemV2(itemList, departmentId, date);
         // const results = supplyItem(item_id, department_id, quantity, date);
         return { success: true, data: resultIds };

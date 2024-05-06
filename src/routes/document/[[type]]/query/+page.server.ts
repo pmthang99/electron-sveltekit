@@ -4,9 +4,7 @@ import { ItemType } from '$lib/server/db/types';
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
-const itemType = ItemType.Secret;
-
-export const load = (async ({ locals, url }) => {
+export const load = (async ({ locals, params, url }) => {
     const user = locals.user;
     const authorized = [Role.Admin, Role.User];
 
@@ -17,6 +15,7 @@ export const load = (async ({ locals, url }) => {
         redirect(302, '/');
     }
 
+    const itemType = params.type === 'secret' ? ItemType.Secret : ItemType.Document;
     const itemName = url.searchParams.get('itemName') as string;
     const departmentId = parseInt(url.searchParams.get('departmentId') as string);
     if (departmentId && itemName) {

@@ -7,10 +7,6 @@
         checked: Writable<boolean>;
     };
     export let checked: Writable<boolean>;
-
-    $: {
-        console.log($checked);
-    }
 </script>
 
 <Checkbox bind:checked={$checked} {...$$restProps} />
