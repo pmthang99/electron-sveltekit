@@ -35,12 +35,16 @@ export interface Inventory {
 }
 
 export interface Transaction {
-    id: number;
     item_id: number;
-    code: string | null;
-    quantity: number;
+    name: string;
+    item_type: ItemType;
+    author?: string;
+    year?: string;
+    code?: string;
+    note?: string;
     department_id: number;
-    transaction_type: string;
+    type: TransactionType;
+    quantity: number;
     date: string;
 }
 

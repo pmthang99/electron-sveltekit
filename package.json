@@ -33,6 +33,8 @@
         "better-sqlite3": "9.2.2",
         "bits-ui": "^0.19.7",
         "clsx": "^2.1.0",
+        "docx": "^8.5.0",
+        "docx-templates": "^4.13.0",
         "electron-serve": "^1.1.0",
         "electron-window-state": "^5.0.3",
         "formsnap": "^0.5.1",

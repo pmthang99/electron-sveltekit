@@ -5,7 +5,7 @@ import type { LayoutServerLoad } from './$types';
 const itemType = ItemType.Document;
 
 export const load = (async () => {
-    const itemNameList = listItemName(itemType) as { name: string }[];
+    const itemNameList = listItemName(itemType);
     const departments = listDepartment();
     return {
         itemNameList,

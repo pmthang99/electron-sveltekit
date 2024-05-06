@@ -1,9 +1,11 @@
 <script lang="ts">
+    import { deserialize } from '$app/forms';
     import { goto } from '$app/navigation';
     import { page } from '$app/stores';
     import DialogSelectItem from '$lib/components/custom/dialog-select-item.svelte';
     import { Button, buttonVariants } from '$lib/components/ui/button';
     import { Calendar } from '$lib/components/ui/calendar';
+    import { Input } from '$lib/components/ui/input';
     import { Label } from '$lib/components/ui/label';
     import * as Popover from '$lib/components/ui/popover';
     import {
@@ -15,19 +17,17 @@
     } from '$lib/components/ui/select';
     import { cn } from '$lib/utils';
     import { CalendarDate, DateFormatter, getLocalTimeZone, today } from '@internationalized/date';
-    import { CalendarIcon } from 'lucide-svelte';
-    import type { ComponentEvents } from 'svelte';
-    import ViewDetailDialog from '../ViewDetailDialog.svelte';
-    import type { ActionData, PageData } from './$types';
     import type { ActionResult } from '@sveltejs/kit';
-    import { deserialize } from '$app/forms';
+    import { CalendarIcon } from 'lucide-svelte';
+    import { onMount, type ComponentEvents } from 'svelte';
+    import ViewDetailDialog from '../ViewDetailDialog.svelte';
+    import type { PageData } from './$types';
     export let data: PageData;
-    export let form: ActionData;
 
-    let selectedIndexes = [];
+    let selected = [];
 
     let resultIds = null;
-    let resultDetails = [];
+    let resultDetails: any[];
 
     const df = new DateFormatter('vi-VN', {
         dateStyle: 'long',
@@ -39,40 +39,50 @@
         date: placeholder,
         org: null,
         item: null,
-        quantity: 1,
+        quantity: 0,
     };
 
+    let inputDate = placeholder;
     let inputItemName = undefined;
     let inputDepartment = undefined;
 
     let viewDialog = false;
 
     function onReset() {
+        inputDate = placeholder;
+        inputItemName = null;
+        inputDepartment = null;
         input = {
             date: placeholder,
             org: null,
             item: null,
-            quantity: 1,
+            quantity: 0,
         };
 
         resultIds = null;
+        goto($page.url.pathname);
     }
 
     async function onSave() {
         const date = input.date.toString();
         const departmentId = inputDepartment.value;
-        console.log(departmentId);
-        const selectedItems = selectedIndexes.map((idx) => {
-            const item = data.storageItems[idx];
-            return {
-                id: item.id,
-                quantity: item.quantity,
-            };
-        });
-        console.log(selectedIndexes);
-        console.log(selectedItems);
-        // const item_id = input.item.value;
-        // const quantity = input.quantity;
+        let selectedItems: { id: number; quantity: number }[];
+        if (input.quantity > 0) {
+            selectedItems = [
+                {
+                    id: data.storageItems[0].id,
+                    quantity: input.quantity,
+                },
+            ];
+        } else {
+            selectedItems = selected.map((idx) => {
+                const item = data.storageItems[idx];
+                return {
+                    id: item.id,
+                    quantity: item.quantity,
+                };
+            });
+        }
 
         const formData = new FormData();
         formData.append('date', date);
@@ -85,65 +95,101 @@
         });
         const result: ActionResult = deserialize(await response.text());
 
-        // const response = await fetch('/api/documents/supply', {
-        //     method: 'POST',
-        //     body: formData,
-        // });
-        // const data = await response.json();
-        // resultIds = data.data;
-        console.log(result.type);
         if (result.type === 'success') {
-            console.log(result.data.data);
+            resultIds = result.data.data;
         }
     }
 
     async function onView() {
+        if (!resultDetails) {
+            const response = await fetch('/api/transactions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ ids: resultIds, action: 'view' }),
+            });
+            resultDetails = (await response.json()).result;
+        }
+        viewDialog = true;
+    }
+
+    async function onPrint() {
         const response = await fetch('/api/transactions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ ids: resultIds }),
+            body: JSON.stringify({
+                ids: resultIds,
+                department: inputDepartment.label,
+                action: 'download',
+                transactionType: 'supply',
+                itemType: 'document',
+            }),
         });
-        resultDetails = (await response.json()).result;
-        viewDialog = true;
+
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'document.docx';
+        a.click();
+        URL.revokeObjectURL(url);
+        a.remove();
     }
 
-    function onPrint() {
-        console.log('Print');
-    }
-
-    function triggerFetch() {
+    function onChangeValue() {
+        const searchParams = new URLSearchParams($page.url.searchParams.toString());
         if (inputItemName) {
-            const searchParams = new URLSearchParams($page.url.searchParams.toString());
-            searchParams.set('itemName', inputItemName.value);
-            goto(`?${searchParams.toString()}`);
+            searchParams.set('item', inputItemName.value);
+            selected.splice(0, selected.length);
         }
+        goto(`?${searchParams.toString()}`);
     }
+
+    onMount(() => {
+        if ($page.url.searchParams.has('departmentId')) {
+            const departmentId = $page.url.searchParams.get('departmentId');
+            const departmentName = data.departments.find(
+                (dept) => dept.id === parseInt(departmentId),
+            );
+            inputDepartment = {
+                value: departmentId,
+                label: departmentName.name,
+            };
+        }
+        if ($page.url.searchParams.has('item')) {
+            inputItemName = {
+                value: $page.url.searchParams.get('item'),
+                label: $page.url.searchParams.get('item'),
+            };
+        }
+    });
 
     function handleConfirmEvent(event: ComponentEvents<DialogSelectItem>['confirm']) {
-        selectedIndexes = event.detail;
+        selected = event.detail;
     }
 </script>
 
 <div class="flex justify-center">
     <div class="flex flex-col">
-        <div class="mb-6 grid gap-2">
+        <div class="mb-6 mx-auto grid gap-2">
             <Label class="mb-2">Ngày cấp</Label>
             <Popover.Root>
                 <Popover.Trigger
                     class={cn(
                         buttonVariants({ variant: 'outline' }),
-                        'w-[280px] justify-start pl-4 text-left font-normal',
+                        'w-[300px] justify-start pl-4 text-left font-normal',
                         !input.date && 'text-muted-foreground',
                     )}
                 >
-                    {input.date ? df.format(input.date.toDate(getLocalTimeZone())) : 'Pick a date'}
+                    {inputDate ? df.format(inputDate.toDate(getLocalTimeZone())) : 'Pick a date'}
                     <CalendarIcon class="ml-auto h-4 w-4 opacity-50" />
                 </Popover.Trigger>
                 <Popover.Content class="w-auto p-0" side="top">
                     <Calendar
-                        bind:value={input.date}
+                        bind:value={inputDate}
                         minValue={new CalendarDate(1900, 1, 1)}
                         maxValue={today(getLocalTimeZone())}
                         initialFocus
@@ -151,56 +197,60 @@
                 </Popover.Content>
             </Popover.Root>
         </div>
-        <div class="mb-6">
+        <div class="mb-6 mx-auto">
             <Label class="mb-2 block">Đơn vị</Label>
             <Select
                 selected={inputDepartment}
                 onSelectedChange={(value) => (inputDepartment = value)}
             >
-                <SelectTrigger class="w-[280px]">
+                <SelectTrigger class="w-[300px]">
                     <SelectValue placeholder="Chọn đơn vị" />
                 </SelectTrigger>
                 <SelectContent>
                     {#each data.departments as department}
-                        <SelectItem value={department.id}>{department.name}</SelectItem>
+                        <SelectItem value={department.id} label={department.name} />
                     {/each}
                 </SelectContent>
             </Select>
         </div>
-        <div class="mb-6">
+        <div class="mb-6 mx-auto">
             <Label class="mb-2 block">Tài liệu</Label>
             <Select
                 selected={inputItemName}
                 onSelectedChange={(value) => {
                     inputItemName = value;
-                    triggerFetch();
+                    onChangeValue();
                 }}
             >
-                <SelectTrigger class="w-[280px]">
+                <SelectTrigger class="w-[300px]">
                     <SelectValue placeholder="Chọn tài liệu" />
                 </SelectTrigger>
                 <SelectContent>
-                    {#each data.itemNameList as item}
-                        <SelectItem value={item.name}>{item.name}</SelectItem>
+                    {#each data.storageNames as name}
+                        <SelectItem value={name} label={name} />
                     {/each}
                 </SelectContent>
             </Select>
         </div>
-        <div class="mb-6">
+        <div class="mb-6 mx-auto">
             <Label for="quantity" class="mb-2 block">Số lượng</Label>
-            <DialogSelectItem on:confirm={handleConfirmEvent} items={data.storageItems} />
+            {#if data.storageItems && data.storageItems.length > 1}
+                <DialogSelectItem on:confirm={handleConfirmEvent} items={data.storageItems} />
+            {:else}
+                <Input class="w-[300px]" type="number" id="quantity" bind:value={input.quantity} />
+            {/if}
         </div>
-        <div class="mb-6 flex gap-20">
+        <div class="mb-6 mx-auto flex gap-20">
             <div class="flex flex-1 justify-center gap-10">
                 <Button on:click={onReset}>Reset</Button>
-                <Button on:click={onSave}>Save</Button>
+                <Button disabled={resultIds} on:click={onSave}>Save</Button>
             </div>
             <div class="flex flex-1 justify-center gap-10">
                 <Button disabled={!resultIds} on:click={onView}>View</Button>
-                <Button disabled on:click={onPrint}>Print</Button>
+                <Button disabled={!resultIds} on:click={onPrint}>Print</Button>
             </div>
         </div>
-        {#if viewDialog}
+        {#if resultDetails}
             <ViewDetailDialog bind:open={viewDialog} bind:dataSource={resultDetails} />
         {/if}
     </div>

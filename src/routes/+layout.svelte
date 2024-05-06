@@ -12,7 +12,6 @@
     import CardHeader from '$lib/components/ui/card/card-header.svelte';
     import { writable, type Writable } from 'svelte/store';
     import { Role } from '$lib/enum';
-    import path from 'path';
 
     export let data: LayoutServerData;
     const { user } = data;
@@ -152,8 +151,12 @@
         <Header {user} />
         <div class="flex flex-1">
             <div class="w-[100%] pt-[14%] grid lg:grid-cols-5">
-                <SideBar class="bg-background min-h-[100%]" {items} {user}></SideBar>
-                <div class="col-span-3 lg:col-span-4 lg:border-l ml-15">
+                <SideBar
+                    class="rounded-lg border-t border-r bg-background min-h-[100%]"
+                    {items}
+                    {user}
+                ></SideBar>
+                <div class="col-span-3 lg:col-span-4 ml-15">
                     <div class="container">
                         <Card>
                             <CardHeader class="items-center ">
