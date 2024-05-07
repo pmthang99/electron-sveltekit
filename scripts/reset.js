@@ -9,7 +9,7 @@ function reset() {
 
     // Truncate tables
     const resetTransaction = () => {
-        const tables = ['actionlog', 'itemdepartment', 'item', 'equipment'];
+        const tables = ['actionlog', 'itemdepartment', 'equipmentdepartment', 'item', 'equipment'];
         for (const table of tables) {
             db.prepare(`DROP TABLE IF EXISTS ${table}`).run();
         }

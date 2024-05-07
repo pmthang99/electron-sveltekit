@@ -38,6 +38,11 @@ export function updatePassword(id: number, password: string) {
     return stmt.run(password, id);
 }
 
+export function removeUser(username: string) {
+    const stmt = db.prepare('DELETE FROM user WHERE username = ?');
+    return stmt.run(username);
+}
+
 // session
 export function createSession(userId: number) {
     // const stmt = db.prepare('INSERT INTO session (id, user_id) VALUES (?, ?)');
@@ -536,9 +541,9 @@ export function viewTransactions(department_id: number, type: TransactionType) {
 }
 
 export function viewTransactionsByIds(ids: number[], itemType: ItemType) {
-    let sql;
+    let sql: string;
     if (itemType === ItemType.Equipment) {
-        sql = `SELECT item.name, item.code, log.*, ed.sync, ed.before_status, ed.after_status
+        sql = `SELECT item.name, item.code, item.sync, log.*, ed.before_status, ed.after_status
         FROM actionlog log
         INNER JOIN equipment item
         ON log.equipment_id = item.id

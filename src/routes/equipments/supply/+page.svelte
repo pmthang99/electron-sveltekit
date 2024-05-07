@@ -61,6 +61,7 @@
         };
 
         resultIds = null;
+        resultDetails = null;
         goto($page.url.pathname);
     }
 

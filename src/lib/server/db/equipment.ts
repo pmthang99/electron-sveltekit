@@ -51,7 +51,7 @@ export function listEquipmentDepartmentDistinct(departmentId: number, all = fals
 }
 
 export function listEquipmentDepartmentByName(departmentId: number, name: string, all = false) {
-    let query = `SELECT eqd.*, eq.name, eq.code
+    let query = `SELECT eq.id, eq.name, eq.code, eq.sync, eqd.quantity, eqd.supply_date, eqd.return_date, eqd.before_status, eqd.after_status
     FROM equipment eq INNER JOIN equipmentdepartment eqd
     ON eq.id = eqd.equipment_id
     WHERE eqd.department_id = ? AND eq.name = ?`;

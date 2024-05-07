@@ -1,12 +1,14 @@
 <script lang="ts">
-    import { addPagination, addTableFilter } from 'svelte-headless-table/plugins';
-    import * as Table from '$lib/components/ui/table';
-    import { Render, Subscribe, createTable } from 'svelte-headless-table';
-    import { readable, writable } from 'svelte/store';
-    import DataTablePagination from './data-table-pagination.svelte';
     import { Input } from '$lib/components/ui/input';
+    import * as Table from '$lib/components/ui/table';
     import { Role } from '$lib/enum';
+    import { onMount } from 'svelte';
+    import { Render, Subscribe, createRender, createTable } from 'svelte-headless-table';
+    import { addPagination, addTableFilter } from 'svelte-headless-table/plugins';
+    import { writable } from 'svelte/store';
     import AddUserDialog from './add-user-dialog.svelte';
+    import DataTableActions from './data-table-actions.svelte';
+    import DataTablePagination from './data-table-pagination.svelte';
 
     export let source: any[];
     const dataSource = writable(source);
@@ -22,6 +24,13 @@
     });
 
     const columns = table.createColumns([
+        table.column({
+            accessor: 'index',
+            header: 'STT',
+            plugins: {
+                filter: { exclude: true },
+            },
+        }),
         table.column({
             accessor: 'username',
             header: 'Tài khoản',
@@ -40,14 +49,34 @@
                 }
             },
         }),
+        table.column({
+            accessor: ({ username }) => username,
+            header: '',
+            cell: ({ value }) => {
+                if (value === 'admin') return '';
+                return createRender(DataTableActions, { username: value, refresh });
+            },
+            plugins: {
+                filter: { exclude: true },
+            },
+        }),
     ]);
 
     const tableModel = table.createViewModel(columns);
     const { headerRows, pageRows, tableAttrs, tableBodyAttrs, pluginStates } = tableModel;
     const { filterValue } = pluginStates.filter;
 
+    onMount(() => {
+        refresh();
+    });
+
+    function refresh() {
+        const processData = source.map((item, index) => ({ index: index + 1, ...item }));
+        $dataSource = processData;
+    }
+
     $: {
-        $dataSource = source;
+        $dataSource = source.map((item, index) => ({ index: index + 1, ...item }));
     }
 </script>
 

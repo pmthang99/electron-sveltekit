@@ -1,7 +1,7 @@
 import { Role } from '$lib/enum';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { addUser, listUser } from '$lib/server/db';
+import { addUser, listUser, removeUser } from '$lib/server/db';
 import bcrypt from 'bcryptjs';
 
 export const load = (async ({ locals }) => {
@@ -39,6 +39,21 @@ export const actions = {
         const hashedPassword = bcrypt.hashSync(password, 10);
 
         addUser(username, hashedPassword, role);
+
+        return {
+            success: true,
+        };
+    },
+    removeUser: async ({ request }) => {
+        const data = await request.formData();
+        const username = data.get('username');
+        if (typeof username !== 'string') {
+            return fail(400, {
+                message: 'Bad request',
+            });
+        }
+
+        removeUser(username);
 
         return {
             success: true,
