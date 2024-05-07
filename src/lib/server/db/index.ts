@@ -318,7 +318,7 @@ export function addDepartment(name: string) {
 export function removeDepartment(department_id: string) {
     try {
         const id = Number(department_id);
-        const query = db.prepare('UPDATE departments SET is_deleted = 1 WHERE id = ?');
+        const query = db.prepare('UPDATE department SET is_deleted = 1 WHERE id = ?');
         const transaction = db.transaction(() => {
             const info = query.run(id);
         });
@@ -543,10 +543,10 @@ export function viewTransactions(department_id: number, type: TransactionType) {
 export function viewTransactionsByIds(ids: number[], itemType: ItemType) {
     let sql: string;
     if (itemType === ItemType.Equipment) {
-        sql = `SELECT item.name, item.code, item.sync, log.*, ed.before_status, ed.after_status
+        sql = `SELECT eq.name, eq.code, eq.sync, log.*, eq.before_status, eq.after_status
         FROM actionlog log
-        INNER JOIN equipment item
-        ON log.equipment_id = item.id
+        INNER JOIN equipment eq
+        ON log.equipment_id = eq.id
         INNER JOIN equipmentdepartment ed
         ON log.equipment_id = ed.equipment_id AND log.department_id = ed.department_id
         WHERE log.id = ?`;

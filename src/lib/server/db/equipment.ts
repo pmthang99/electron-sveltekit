@@ -29,7 +29,7 @@ export function listEquipmentStorageByName(name: string) {
 }
 
 export function listEquipmentDepartment(departmentId: number, all = false) {
-    let query = `SELECT eqd.*, eq.name, eq.code
+    let query = `SELECT eq.id, eq.name, eq.code, eq.sync, eqd.quantity, eqd.supply_date, eqd.return_date, eq.before_status, eq.after_status
     FROM equipment eq INNER JOIN equipmentdepartment eqd
     ON eq.id = eqd.equipment_id
     WHERE eqd.department_id = ?`;
@@ -51,7 +51,7 @@ export function listEquipmentDepartmentDistinct(departmentId: number, all = fals
 }
 
 export function listEquipmentDepartmentByName(departmentId: number, name: string, all = false) {
-    let query = `SELECT eq.id, eq.name, eq.code, eq.sync, eqd.quantity, eqd.supply_date, eqd.return_date, eqd.before_status, eqd.after_status
+    let query = `SELECT eq.id, eq.name, eq.code, eq.sync, eqd.quantity, eqd.supply_date, eqd.return_date, eq.before_status, eq.after_status
     FROM equipment eq INNER JOIN equipmentdepartment eqd
     ON eq.id = eqd.equipment_id
     WHERE eqd.department_id = ? AND eq.name = ?`;
@@ -143,7 +143,7 @@ export function returnEquipment(
 
         const updateStorageQuery = db.prepare(
             `UPDATE equipment
-            SET quantity = quantity + $quantity
+            SET quantity = quantity + $quantity, after_status = $after_status
             WHERE id = $id`,
         );
 
@@ -166,6 +166,7 @@ export function returnEquipment(
             const updateStorage = updateStorageQuery.run({
                 id: item.id,
                 quantity: item.quantity,
+                after_status: item.after_status,
             });
             if (updateStorage.changes === 0) {
                 throw new Error('Failed to update storage');
