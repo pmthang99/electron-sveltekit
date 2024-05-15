@@ -81,7 +81,7 @@ export function supplyEquipment(
     const actionType = TransactionType.Supply;
     const transaction = () => {
         const updateStorageQuery = db.prepare(`UPDATE equipment
-        SET quantity = quantity - $quantity
+        SET quantity = quantity - $quantity, after_status = NULL
         WHERE id = $id AND quantity >= $quantity`);
 
         const insertDepartmentQuery = db.prepare(
@@ -89,7 +89,7 @@ export function supplyEquipment(
             (equipment_id, department_id, quantity, supply_date, before_status)
             VALUES ($id, $department_id, $quantity, $date, $before_status)
             ON CONFLICT(equipment_id, department_id) DO UPDATE
-            SET quantity = quantity + $quantity`,
+            SET quantity = quantity + $quantity, supply_date = $date, before_status = $before_status, return_date = NULL, after_status = NULL`,
         );
 
         for (const item of items) {

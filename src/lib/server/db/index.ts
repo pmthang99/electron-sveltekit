@@ -4,7 +4,6 @@ import {
     ItemType,
     TransactionType,
     type Department,
-    type Inventory,
     type Item,
     type Transaction,
     type User,
@@ -164,7 +163,7 @@ export function supplyItemV2(
                     `INSERT INTO itemdepartment (item_id, department_id, quantity, supply_date)
                     VALUES ($itemId, $departmentId, $quantity, $date)
                     ON CONFLICT(item_id, department_id) DO
-                    UPDATE SET quantity = quantity + $quantity`,
+                    UPDATE SET quantity = quantity + $quantity, supply_date = $date, return_date = NULL`,
                 )
                 .run({
                     itemId: item.id,
